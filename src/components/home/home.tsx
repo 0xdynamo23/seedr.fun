@@ -5,14 +5,14 @@ import React from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 // import { footer } from "../navigation/footer";
-
+import { useState } from "react";
 const projects = [{
   id: 1,
   title: "Cyronomics",
   description: "Platform to sell comics on chain",
   raised: 2456,
   contributors: 5,
-  type:"DAO"
+  category: "DAO"
 },
 {
   id: 2,
@@ -20,7 +20,7 @@ const projects = [{
   description: "Platform to sell comics on chain",
   raised: 2456,
   contributors: 5,
-  type:"Defi"
+  category: "DeFi"
 },
 ]
 type Project = {
@@ -29,6 +29,7 @@ type Project = {
   description: string;
   raised: number;
   contributors: number;
+  category: string;
 }
 type ProjectProps = { project: Project };
 
@@ -71,7 +72,9 @@ const ProjectCard: React.FC<ProjectProps> = ({ project }) => (
   </div>
 );
 
+
 const HeroSection = () => {
+  const [selectedCategory, setSelectedCategory] = useState("Trending");
   return (
     <div className="min-h-screen bg-white w-full xl:max-w-screen-xl">
       {/* Background image */}
@@ -143,7 +146,8 @@ const HeroSection = () => {
               ].map((category, index) => (
                 <button
                   key={category}
-                  className={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${index === 0
+                  onClick={() => setSelectedCategory(category)}
+                  className={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${category == selectedCategory
                     ? "bg-gray-900 text-white"
                     : "border border-gray-200 text-gray-600 hover:bg-gray-50"
                     }`}
@@ -155,17 +159,22 @@ const HeroSection = () => {
 
             {/* Projects Grid */}
             <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
-              {projects.map((project, i) => (
-                <motion.div
-                  key={project.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ delay: i * 0.1 }}
-                >
-                  <ProjectCard project={project} />
-                </motion.div>
-              ))}
+              {projects
+                .filter((project) =>
+                  ["all projects", "trending"].includes(selectedCategory.toLowerCase()) ||
+                  project.category.toLowerCase() === selectedCategory.toLowerCase()
+                )
+                .map((project, i) => (
+                  <motion.div
+                    key={project.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{ delay: i * 0.1 }}
+                  >
+                    <ProjectCard project={project} />
+                  </motion.div>
+                ))}
             </div>
 
             {/* Pagination */}
