@@ -1,9 +1,13 @@
 import { Footer, Navbar, Providers } from "@/components";
 import { Toaster } from "@/components/ui/sonner";
 import "@/styles/globals.css";
-import { aeonik, cn, generateMetadata, inter } from "@/utils";
+import { aeonik, cn, inter } from "@/utils";
+import { Metadata } from "next";
 
-export const metadata = generateMetadata();
+export const metadata: Metadata={
+    title: "Seedr",
+    description: "Support builders you trust",
+};
 
 export default function RootLayout({
     children,
