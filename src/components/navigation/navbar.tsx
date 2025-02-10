@@ -46,7 +46,7 @@ const Navbar = () => {
   return (
     <header
       className={cn(
-        "fixed top-0 inset-x-0 w-full z-[99999] select-none py-4",
+        "fixed top-0 inset-x-0 w-full z-10 select-none py-4",
         scroll && "bg-background/40 backdrop-blur-md"
       )}
     >
@@ -54,7 +54,7 @@ const Navbar = () => {
         <MaxWidthWrapper className="flex items-center justify-between px-5 bg-transparent">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/#home">
+            <Link href="/">
               <div className="flex items-center space-x-2">
                 <Image
                   src="/icon-seedr.png"

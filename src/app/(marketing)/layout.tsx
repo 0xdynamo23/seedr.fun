@@ -1,22 +1,45 @@
-import React from "react";
-import { Footer, Navbar } from "@/components";
-import { GoogleAnalytics } from '@next/third-parties/google'
+"use client";
+import React, { useState, useEffect, createContext, useContext } from "react";
+import CustomSidebar from "@/components/dashboard/Sidebar";
+import { cn } from "@/utils";
+// import { ThemeProvider } from "next-themes";
+import {
+  Abstraxion,
+  useAbstraxionAccount,
+  useModal,
+} from "@burnt-labs/abstraxion";
+import { Button } from "@burnt-labs/ui";
+import { AddressProvider } from "@/context/AddressContext";
+import { Navbar } from "@/components";
 
-interface Props {
-  children: React.ReactNode;
-}
+// Custom hook for consuming the context
 
-const MarketingLayout = ({ children }: Props) => {
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+
+  // Abstraxion hooks
+  const {
+    data: { bech32Address },
+    isConnected,
+    isConnecting,
+  } = useAbstraxionAccount();
+
+  // General state hooks
+  const [, setShow] = useModal();
+
+  // Log connection state (for testing)
+  useEffect(() => {
+    console.log({ isConnected, isConnecting });
+  }, [isConnected, isConnecting]);
+
   return (
-    <>
-      <GoogleAnalytics gaId="G-4KGSP3415V" />
-      <div className="flex flex-col min-h-screen ">
+    <AddressProvider value={{ bech32Address, isConnected, isConnecting }}>
+      <div>
         <Navbar />
-        <main className="flex-grow mx-auto w-full relative z-0">{children}</main>
-        {/* <Footer /> */}
+        {children}
+        <Abstraxion onClose={() => setShow(false)} />
       </div>
-    </>
+    </AddressProvider>
   );
-};
-
-export default MarketingLayout;
+}

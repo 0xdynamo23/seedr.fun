@@ -6,7 +6,33 @@ import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 // import { footer } from "../navigation/footer";
 
-const ProjectCard = () => (
+const projects = [{
+  id: 1,
+  title: "Cyronomics",
+  description: "Platform to sell comics on chain",
+  raised: 2456,
+  contributors: 5,
+  type:"DAO"
+},
+{
+  id: 2,
+  title: "Cyronomics",
+  description: "Platform to sell comics on chain",
+  raised: 2456,
+  contributors: 5,
+  type:"Defi"
+},
+]
+type Project = {
+  id: number;
+  title: string;
+  description: string;
+  raised: number;
+  contributors: number;
+}
+type ProjectProps = { project: Project };
+
+const ProjectCard: React.FC<ProjectProps> = ({ project }) => (
   <div className="p-6 rounded-xl border border-gray-200 bg-white">
     <div className="flex items-start justify-between">
       <div className="flex items-center gap-3">
@@ -14,9 +40,9 @@ const ProjectCard = () => (
           <span className="text-white font-bold">C</span>
         </div>
         <div className="flex flex-col">
-          <span className="font-medium text-gray-900">Cyronomics</span>
+          <span className="font-medium text-gray-900">{project.title}</span>
           <span className="text-sm text-gray-500">
-            Platform to sell comics on chain
+            {project.description}
           </span>
         </div>
       </div>
@@ -35,10 +61,10 @@ const ProjectCard = () => (
     </div>
     <div className="mt-4 flex items-center justify-between">
       <div className="flex items-center gap-2">
-        <span className="text-sm text-gray-500">5 Contributors</span>
-        <span className="text-sm font-medium">$2,456 Raised</span>
+        <span className="text-sm text-gray-500">{project.contributors} Contributors</span>
+        <span className="text-sm font-medium">${project.raised} Raised</span>
       </div>
-      <Link href="/product/123" className="text-sm text-blue-500 hover:underline">
+      <Link href={`/project/${project.id}`} className="text-sm text-blue-500 hover:underline">
         view project →
       </Link>
     </div>
@@ -50,7 +76,7 @@ const HeroSection = () => {
     <div className="min-h-screen bg-white w-full xl:max-w-screen-xl">
       {/* Background image */}
       <div
-        className="absolute right-0 top-0 z-0"
+        className="absolute right-0 top-0 "
         style={{ width: "877px", height: "657px", marginTop: "-54px" }}
       >
         <Image
@@ -65,7 +91,7 @@ const HeroSection = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 px-2 max-w-full">
+      <div className="relative px-2 max-w-full">
         <div className="pt-24 max-w-full mx-auto">
           {/* Hero Content */}
           <div className="max-w-2xl mb-16">
@@ -117,11 +143,10 @@ const HeroSection = () => {
               ].map((category, index) => (
                 <button
                   key={category}
-                  className={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${
-                    index === 0
-                      ? "bg-gray-900 text-white"
-                      : "border border-gray-200 text-gray-600 hover:bg-gray-50"
-                  }`}
+                  className={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${index === 0
+                    ? "bg-gray-900 text-white"
+                    : "border border-gray-200 text-gray-600 hover:bg-gray-50"
+                    }`}
                 >
                   {category}
                 </button>
@@ -130,19 +155,17 @@ const HeroSection = () => {
 
             {/* Projects Grid */}
             <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
-              {Array(9)
-                .fill()
-                .map((_, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ delay: i * 0.1 }}
-                  >
-                    <ProjectCard />
-                  </motion.div>
-                ))}
+              {projects.map((project, i) => (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ delay: i * 0.1 }}
+                >
+                  <ProjectCard project={project} />
+                </motion.div>
+              ))}
             </div>
 
             {/* Pagination */}
@@ -151,12 +174,11 @@ const HeroSection = () => {
                 <ChevronLeft className="w-4 h-4" />
                 Previous
               </button>
-                {[1, 2, 3, "...", 10].map((page, i) => (
+              {[1, 2, 3, "...", 10].map((page, i) => (
                 <button
                   key={i}
-                  className={`w-8 h-8 flex items-center justify-center rounded-full ${
-                  page === 1 ? "bg-gray-100" : "hover:bg-gray-50"
-                  } text-black`}
+                  className={`w-8 h-8 flex items-center justify-center rounded-full ${page === 1 ? "bg-gray-100" : "hover:bg-gray-50"
+                    } text-black`}
                 >
                   {page}
                 </button>
