@@ -1,7 +1,5 @@
 "use client";
 import React, { useState, useEffect, createContext, useContext } from "react";
-import CustomSidebar from "@/components/dashboard/Sidebar";
-import { cn } from "@/utils";
 // import { ThemeProvider } from "next-themes";
 import {
   Abstraxion,

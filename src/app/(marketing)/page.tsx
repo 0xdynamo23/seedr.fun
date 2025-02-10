@@ -1,8 +1,8 @@
 "use client";
-import { AnimationContainer, MaxWidthWrapper } from "@/components";
+import { MaxWidthWrapper } from "@/components";
 import HeroSection from "@/components/home/home";
 
-const HomePage = async () => {
+const HomePage = () => {
 
   return (
     <div className="scrollbar-hide size-full">
