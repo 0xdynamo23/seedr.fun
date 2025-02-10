@@ -9,11 +9,6 @@ import Footer from "./navigation/footer";
 // providers
 import Providers from "./providers/providers";
 
-// dashboard
-import Sidebar from "./dashboard/Sidebar";
-import DashboardNavbar from "./dashboard/dashboard-navbar";
-
-
 export {
     Icons,
     MaxWidthWrapper,
@@ -22,9 +17,5 @@ export {
     Footer,
 
     Providers,
-
-    Sidebar,
-    DashboardNavbar,
-
 
 };
