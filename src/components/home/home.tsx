@@ -4,7 +4,7 @@ import Image from "next/image";
 import React from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-// import { footer } from "../navigation/footer";
+import Footer from "../navigation/footer";
 import { useState } from "react";
 const projects = [{
   id: 1,
@@ -37,8 +37,8 @@ const ProjectCard: React.FC<ProjectProps> = ({ project }) => (
   <div className="p-6 rounded-xl border border-gray-200 bg-white">
     <div className="flex items-start justify-between">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
-          <span className="text-white font-bold">C</span>
+        <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden">
+          <Image src="/icons/icon4.png" alt="Logo" width={40} height={40} />
         </div>
         <div className="flex flex-col">
           <span className="font-medium text-gray-900">{project.title}</span>
@@ -200,7 +200,7 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-      <footer />
+      <Footer />
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import { Footer, Navbar, Providers } from "@/components";
+// import AuthProvider from "@/components/authProvider";
 import { Toaster } from "@/components/ui/sonner";
 import "@/styles/globals.css";
 import { aeonik, cn, inter } from "@/utils";
@@ -15,6 +16,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
+        // <AuthProvider>
         <html lang="en" className="scrollbar">
             <body
                 className={cn(
@@ -25,11 +27,12 @@ export default function RootLayout({
             >
                 <Providers>
                     <Toaster richColors theme="dark" position="top-right" />
-                    <Navbar/>
+                    {typeof window !== 'undefined' && window.location.pathname !== '/form' && <Navbar />}
                     {children}
-                    <Footer/>
+                    {typeof window !== 'undefined' && window.location.pathname !== '/form' && <Footer />}
                 </Providers>
             </body>
         </html>
+        // </AuthProvider>
     );
 };
