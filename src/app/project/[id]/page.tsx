@@ -1,71 +1,49 @@
-'use client';
-import { useState } from 'react';
+"use client";
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
-export default function PostProduct() {
-  const [form, setForm] = useState({ name: '', price: '', description: '' });
-  const [loading, setLoading] = useState(false);
+type Project = {
+  id: string;
+  name: string;
+  description: string;
+  raised: number;
+  contributors: number;
+  category: string;
+};
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+const ProductPage = ({ params }: { params: { id: string } }) => {
+  console.log(params);
+  const [project, setProject] = useState<Project | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  useEffect(() => {
+    const fetchProject = async () => {
+      try {
+        const response = await axios.post(`/api/product`, { id: params.id });
+        console.log(response.data);
+        setProject(response.data);
+      } catch (error) {
+        console.error('Error fetching pro:', error);
+      }
+    };
 
-    const res = await fetch('/api/post', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    });
+    fetchProject();
+  }, [params.id]);
 
-    if (res.ok) {
-      alert('Product added successfully!');
-      setForm({ name: '', price: '', description: '' });
-    } else {
-      alert('Error adding product');
-    }
-    setLoading(false);
-  };
+  if (!project) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-bold mb-4">Post Your Product</h2>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input
-          type="text"
-          name="name"
-          placeholder="Product Name"
-          value={form.name}
-          onChange={handleChange}
-          className="border p-2 rounded-lg"
-          required
-        />
-        <input
-          type="number"
-          name="price"
-          placeholder="Price"
-          value={form.price}
-          onChange={handleChange}
-          className="border p-2 rounded-lg"
-          required
-        />
-        <textarea
-          name="description"
-          placeholder="Description"
-          value={form.description}
-          onChange={handleChange}
-          className="border p-2 rounded-lg"
-          required
-        ></textarea>
-        <button
-          type="submit"
-          className="bg-green-500 text-white px-6 py-2.5 rounded-lg font-medium"
-          disabled={loading}
-        >
-          {loading ? 'Posting...' : 'Submit'}
-        </button>
-      </form>
+    <div>
+      <h1 className='text-black'>{project?.name}</h1>
+
+      {/* <p>{project?.description}</p>
+      <p>Raised: ${project?.raised}</p>
+      <p>Contributors: {project?.contributors}</p>
+      <p>Category: {project?.category}</p> */}
     </div>
   );
-}
+};
+
+export default ProductPage;
+
