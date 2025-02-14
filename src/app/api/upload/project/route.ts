@@ -1,13 +1,13 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const teamEmails = body.team?.map(member => member.name);
+    const teamEmails = body.team?.map((member: { name: string }) => member.name);
     const newProject = await prisma.project.create({
       data: {
         name: body.name,

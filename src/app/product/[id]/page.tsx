@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import projects from "../../data/projects"; // Import your projects array
+// import projects from "../../data/projects";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -16,15 +16,15 @@ type Project = {
 
 const ProjectPage = () => {
   const router = useRouter();
-  const { id } = router.query; // Get project ID from the URL
+  // const { id } = router.query;
   const [project, setProject] = useState<Project | null>(null);
 
-  useEffect(() => {
-    if (id) {
-      const foundProject = projects.find((p) => p.id === Number(id));
-      setProject(foundProject || null);
-    }
-  }, [id]);
+  // useEffect(() => {
+  //   if (id) {
+  //     const foundProject = projects.find((p) => p.id === Number(id));
+  //     setProject(foundProject || null);
+  //   }
+  // }, [id]);
 
   if (!project) {
     return <div className="text-center mt-10">Project not found</div>;

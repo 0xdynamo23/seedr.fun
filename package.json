@@ -12,6 +12,7 @@
     "@burnt-labs/abstraxion": "^1.0.0-alpha.54",
     "@bytescale/upload-widget-react": "^4.19.0",
     "@hookform/resolvers": "^3.6.0",
+    "@neondatabase/serverless": "github:neondatabase/serverless",
     "@next/third-parties": "^15.0.3",
     "@prisma/client": "^6.3.1",
     "@radix-ui/react-accordion": "^1.1.2",

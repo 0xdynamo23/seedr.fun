@@ -9,7 +9,14 @@ const SUPER_ADMINS = process.env.NEXT_PUBLIC_SUPER_ADMINS?.split(",") || [];
 
 const AdminPage = () => {
   const router = useRouter();
-  const [projects, setProjects] = useState([]);
+  interface Project {
+    id: number;
+    name: string;
+    description: string;
+    status?: string;
+  }
+
+  const [projects, setProjects] = useState<Project[]>([]);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 

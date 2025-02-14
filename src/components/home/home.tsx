@@ -1,72 +1,57 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Footer from "../navigation/footer";
 import { useState } from "react";
-const projects = [{
-  id: 1,
-  title: "Cyronomics",
-  description: "Platform to sell comics on chain",
-  raised: 2456,
-  contributors: 5,
-  category: "DAO"
-},
-{
-  id: 2,
-  title: "Cyronomics",
-  description: "Platform to sell comics on chain",
-  raised: 2456,
-  contributors: 5,
-  category: "DeFi"
-},
-]
+
 type Project = {
-  id: number;
-  title: string;
-  description: string;
-  raised: number;
-  contributors: number;
+  id: string;
+  name: string;
+  tagline: string;
   category: string;
-}
+  logo: string;
+  description: string;
+  raised?: number; // Make it optional
+  contributors?: number;
+};
+
+// const projects = [{
+//   id: 1,
+//   title: "Cyronomics",
+//   description: "Platform to sell comics on chain",
+//   raised: 2456,
+//   contributors: 5,
+//   category: "DAO"
+// },
+// ]
+
 type ProjectProps = { project: Project };
 
-const ProjectCard: React.FC<ProjectProps> = ({ project }) => (
+const ProjectCard: React.FC<{ project: Project }> = ({ project }) => (
   <div className="p-6 rounded-xl border border-gray-200 bg-white">
     <div className="flex items-start justify-between">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden">
-          <Image src="/icons/icon4.png" alt="Logo" width={40} height={40} />
+          <Image src={project.logo} alt="Logo" width={40} height={40} />
         </div>
         <div className="flex flex-col">
-          <span className="font-medium text-gray-900">{project.title}</span>
-          <span className="text-sm text-gray-500">
-            {project.description}
-          </span>
+          <span className="font-medium text-gray-900">{project.name}</span>
+          <span className="text-sm text-gray-500">{project.tagline}</span>
         </div>
       </div>
-      <button className="text-gray-400 hover:text-gray-600">
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-        </svg>
-      </button>
     </div>
     <div className="mt-4 flex items-center justify-between">
       <div className="flex items-center gap-2">
-        <span className="text-sm text-gray-500">{project.contributors} Contributors</span>
-        <span className="text-sm font-medium">${project.raised} Raised</span>
+        <span className="text-sm text-gray-500">
+          {project.contributors ?? 0} Contributors
+        </span>
+        <span className="text-sm font-medium">${project.raised ?? 0} Raised</span>
       </div>
       <Link href={`/project/${project.id}`} className="text-sm text-blue-500 hover:underline">
-        view project →
+        View Project →
       </Link>
     </div>
   </div>
@@ -74,6 +59,24 @@ const ProjectCard: React.FC<ProjectProps> = ({ project }) => (
 
 
 const HeroSection = () => {
+  const [projects, setProjects] = useState<Project[]>([]);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await fetch("/api/getprojects");
+        // if (!response.ok) throw new Error("Failed to fetch projects");
+        const data: Project[] = await response.json();
+        console.log(data);
+        setProjects(data.data);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
   const [selectedCategory, setSelectedCategory] = useState("Trending");
   return (
     <div className="min-h-screen bg-white w-full xl:max-w-screen-xl">
@@ -159,19 +162,14 @@ const HeroSection = () => {
 
             {/* Projects Grid */}
             <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
-              {projects
-                .filter((project) =>
-                  ["all projects", "trending"].includes(selectedCategory.toLowerCase()) ||
+            {Array.isArray(projects) &&
+              projects
+                .filter((project) => 
+                  ["all projects", "trending"].includes(selectedCategory.toLowerCase()) || 
                   project.category.toLowerCase() === selectedCategory.toLowerCase()
                 )
                 .map((project, i) => (
-                  <motion.div
-                    key={project.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ delay: i * 0.1 }}
-                  >
+                  <motion.div key={project.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ delay: i * 0.1 }}>
                     <ProjectCard project={project} />
                   </motion.div>
                 ))}
