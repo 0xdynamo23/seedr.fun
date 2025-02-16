@@ -94,15 +94,15 @@ const PaymentModal = ({
                   min="1"
                 />
                 <div className="flex items-center space-x-3">
-                  <span className="text-gray-700 text-xl">XION</span>
-                  <div className="relative w-8 h-8">
+                <div className="relative w-8 h-8">
                     <Image
-                      src="/xion-logo.png"
+                      src="/Xion.png"
                       alt="Xion"
                       fill
                       className="object-contain"
                     />
                   </div>
+                  <span className="text-gray-700 text-xl">XION</span>
                 </div>
               </div>
               <p className="text-sm text-gray-600 mt-3 text-center">
