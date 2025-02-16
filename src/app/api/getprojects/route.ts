@@ -10,7 +10,7 @@ export type Project = {
   description: string;
   raised?: number; // Optional
   contributors?: number;
-  projectPics?. string[]
+  projectPics?: string[]
 };
 
 // API Route to get projects
@@ -24,7 +24,8 @@ export async function GET(req: NextRequest) {
         category: true,
         logo: true,
         description: true,
-        
+        projectPics: true,
+
       },
       where: {
         status: "ACCEPTED",

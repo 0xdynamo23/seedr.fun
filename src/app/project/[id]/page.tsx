@@ -152,7 +152,7 @@ const ProductPage = ({ params }: { params: { id: string } }) => {
   }
 
   return (
-    <div>
+    <div className="w-screen">
       <div className="p-6 bg-white rounded-lg shadow-md w-full h-full">
         {/* Project Header */}
         <div className="flex items-center space-x-3">
@@ -223,11 +223,13 @@ const ProductPage = ({ params }: { params: { id: string } }) => {
           </div>
         </div>
 
-        {/* Timestamp */}
-        <div className="mt-6 text-gray-500 text-sm">
+        Timestamp
+        {/* <div className="mt-6 text-gray-500 text-sm">
           Created: {new Date(project?.timestamp).toLocaleString()}
-        </div>
+        </div> */}
       </div>
+
+      
 
       {/* Comments Section */}
       <div className="mt-8 p-6 bg-white rounded-lg shadow-md">
