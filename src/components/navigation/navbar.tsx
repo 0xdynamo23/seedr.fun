@@ -6,7 +6,7 @@ import { Search, User } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import MaxWidthWrapper from "../global/max-width-wrapper";
-// import MobileNavbar from "./mobile-navbar";
+import MobileNavbar from "./mobile-navbar";
 import AnimationContainer from "../global/animation-container";
 import Image from "next/image";
 import { useAbstraxionAccount, useModal, useAbstraxionSigningClient } from "@burnt-labs/abstraxion";
@@ -102,21 +102,18 @@ const Navbar = () => {
             </div>
           </Link>
 
-          <div className="flex items-center gap-4">
+          {/* Desktop Navigation - Hidden on Mobile */}
+          <div className="hidden lg:flex items-center gap-4">
             {isConnected && (
               <>
-                {/* Admin Panel Button (Only for Super Admins) */}
                 {isAdmin && (
                   <Link href="/admin">
-                    <Button 
-                      className="bg-red-500 hover:bg-red-600 text-white rounded-lg h-9 px-3 text-sm"
-                    >
+                    <Button className="bg-red-500 hover:bg-red-600 text-white rounded-lg h-9 px-3 text-sm">
                       Admin Panel
                     </Button>
                   </Link>
                 )}
 
-                {/* Connect Wallet Button */}
                 <Button
                   className={cn(
                     buttonVariants({
@@ -132,12 +129,8 @@ const Navbar = () => {
                   {isConnecting ? 'Connecting...' : isConnected ? "Disconnect" : "Connect Wallet"}
                 </Button>
 
-                {/* Profile Icon */}
                 <Link href="/profile">
-                  <Button 
-                    variant="ghost" 
-                    className="w-10 h-10 p-2.5 bg-emerald-50 hover:bg-emerald-100 rounded-full transition-colors flex items-center justify-center"
-                  >
+                  <Button variant="ghost" className="w-10 h-10 p-2.5 bg-emerald-50 hover:bg-emerald-100 rounded-full transition-colors flex items-center justify-center">
                     <User className="w-5 h-5 text-emerald-600 stroke-[2.5px]" />
                   </Button>
                 </Link>
@@ -163,8 +156,7 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Navigation */}
-          <div className="lg:hidden">
-          </div>
+          <MobileNavbar />
         </MaxWidthWrapper>
       </AnimationContainer>
     </header>

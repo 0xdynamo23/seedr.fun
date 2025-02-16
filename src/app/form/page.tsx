@@ -22,14 +22,14 @@ const ProgressDot: React.FC<ProgressDotProps> = ({
   active,
   completed,
 }: ProgressDotProps) => (
-  <div className="w-full">
+  <div className="">
     <div
       className={`h-1 rounded-full transition-all duration-300 ${
         completed
-          ? "bg-emerald-500"
+          ? "bg-emerald-200 w-4"
           : active
-          ? "bg-emerald-500 w-20"
-          : "bg-gray-200 flex-1"
+          ? "bg-emerald-500 w-16"
+          : "bg-gray-200 flex-1 w-4"
       }`}
     />
   </div>
@@ -171,9 +171,9 @@ const ModernProjectForm = () => {
     switch (step) {
       case 1:
         return (
-          <div className=" h-[300px]">
-            <div className="mb-3">
-              <p className="font-semibold text-black px-2 font-poppins mb-2">
+          <div className="space-y-6">
+            <div>
+              <p className="font-semibold text-black px-2 font-poppins mb-2 text-sm sm:text-base">
                 Project name
               </p>
               <input
@@ -181,12 +181,12 @@ const ModernProjectForm = () => {
                 name="name"
                 value={form.name}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all text-black"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all text-black text-sm sm:text-base"
               />
             </div>
 
-            <div className="mt-6">
-              <p className="font-semibold text-black px-2 font-poppins mb-2">
+            <div>
+              <p className="font-semibold text-black px-2 font-poppins mb-2 text-sm sm:text-base">
                 Short tagline
               </p>
               <input
@@ -194,7 +194,7 @@ const ModernProjectForm = () => {
                 name="tagline"
                 value={form.tagline}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all text-black"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all text-black text-sm sm:text-base"
               />
             </div>
           </div>
@@ -202,20 +202,27 @@ const ModernProjectForm = () => {
 
       case 2:
         return (
-          <div className="space-y-4 h-[270px] ">
-            <p className="text-black font-semibold font-poppins">Categories</p>
-            <select
-              name="category"
-              value={form.category}
-              onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all text-black"
-            >
-              <option value="">Select your category here</option>
-              <option value="defi">DeFi</option>
-              <option value="nft">NFT</option>
-              <option value="gaming">Gaming</option>
-              <option value="other">Other</option>
-            </select>
+          <div className="space-y-4">
+            <p className="text-black font-semibold font-poppins text-sm sm:text-base">Categories</p>
+            <div className="relative">
+              <select
+                name="category"
+                value={form.category}
+                onChange={handleChange}
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all text-black text-sm sm:text-base appearance-none bg-white"
+              >
+                <option value="" className="py-2">Select your category here</option>
+                <option value="defi" className="py-2">DeFi</option>
+                <option value="nft" className="py-2">NFT</option>
+                <option value="gaming" className="py-2">Gaming</option>
+                <option value="other" className="py-2">Other</option>
+              </select>
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
           </div>
         );
 
@@ -249,56 +256,59 @@ const ModernProjectForm = () => {
 
       case 5:
         return (
-          <div className="space-y-4 h-[300px] overflow-y-auto">
-            <p className="text-black font-semibold">Add team</p>
-            {form.team.map((member, index) => (
-              <div key={index} className="flex gap-4 items-center">
-                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-medium text-lg">
-                  {member.avatar ? (
-                    <img
-                      src={URL.createObjectURL(member.avatar)}
-                      alt="Avatar"
-                      className="w-full h-full rounded-full object-cover"
+          <div className="space-y-4 max-h-[350px] sm:max-h-[400px] overflow-y-auto px-1">
+            <p className="text-black font-semibold text-sm sm:text-base sticky top-0 bg-white py-2 z-10">Add team</p>
+            <div className="space-y-3">
+              {form.team.map((member, index) => (
+                <div key={index} className="flex flex-col sm:flex-row gap-3 sm:items-center p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-medium text-lg shrink-0">
+                      {member.avatar ? (
+                        <img
+                          src={URL.createObjectURL(member.avatar)}
+                          alt="Avatar"
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                      ) : (
+                        <span>
+                          {member.name ? member.name.charAt(0).toUpperCase() : "U"}
+                        </span>
+                      )}
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Name"
+                      value={member.name}
+                      onChange={(e) => {
+                        const newTeam = [...form.team];
+                        newTeam[index].name = e.target.value;
+                        setForm((prev) => ({ ...prev, team: newTeam }));
+                      }}
+                      className="flex-1 px-3 py-2 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-black text-sm"
                     />
-                  ) : (
-                    <span>
-                      {member.name ? member.name.charAt(0).toUpperCase() : "U"}
-                    </span>
-                  )}
+                  </div>
+                  <select
+                    value={member.position}
+                    onChange={(e) => {
+                      const newTeam = [...form.team];
+                      newTeam[index].position = e.target.value;
+                      setForm((prev) => ({ ...prev, team: newTeam }));
+                    }}
+                    className="px-3 py-2 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-black text-sm w-full sm:w-auto"
+                  >
+                    <option value="">Select Position</option>
+                    <option value="founder">Founder</option>
+                    <option value="developer">Developer</option>
+                    <option value="designer">Designer</option>
+                    <option value="other">Other</option>
+                  </select>
                 </div>
-
-                <input
-                  type="text"
-                  placeholder="Name"
-                  value={member.name}
-                  onChange={(e) => {
-                    const newTeam = [...form.team];
-                    newTeam[index].name = e.target.value;
-                    setForm((prev) => ({ ...prev, team: newTeam }));
-                  }}
-                  className="flex-1 px-4 py-2 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-black"
-                />
-                <select
-                  value={member.position}
-                  onChange={(e) => {
-                    const newTeam = [...form.team];
-                    newTeam[index].position = e.target.value;
-                    setForm((prev) => ({ ...prev, team: newTeam }));
-                  }}
-                  className="px-4 py-2 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-black"
-                >
-                  <option value="">Position</option>
-                  <option value="founder">Founder</option>
-                  <option value="developer">Developer</option>
-                  <option value="designer">Designer</option>
-                  <option value="designer">Other</option>
-                </select>
-              </div>
-            ))}
+              ))}
+            </div>
             <button
               type="button"
               onClick={addTeamMember}
-              className="text-emerald-500 flex items-center gap-2 hover:text-emerald-600 transition-colors"
+              className="text-emerald-500 flex items-center gap-2 hover:text-emerald-600 transition-colors text-sm"
             >
               <Plus size={16} />
               Add another member
@@ -487,10 +497,10 @@ const ModernProjectForm = () => {
 
   return (
     <MaxWidthWrapper>
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 py-20">
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-xl bg-white rounded-xl shadow-lg relative"
+          className="w-full max-w-xl bg-white rounded-xl shadow-lg relative mx-4 sm:mx-auto"
         >
           <button
             type="button"
@@ -499,13 +509,13 @@ const ModernProjectForm = () => {
             <X size={20} />
           </button>
 
-          <div className="p-7">
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold text-black mb-2">
+          <div className="p-4 sm:p-7">
+            <div className="mb-6 sm:mb-8">
+              <h2 className="text-lg sm:text-xl font-semibold text-black mb-2">
                 {getStepTitle()}
               </h2>
               <p className="text-sm text-gray-400">{getStepSubtitle()}</p>
-              <div className="flex w-30 gap-1 mt-6">
+              <div className="flex w-full gap-1 mt-4 sm:mt-6">
                 {[1, 2, 3, 4, 5, 6, 7].map((dotStep) => (
                   <ProgressDot
                     key={dotStep}
@@ -516,32 +526,27 @@ const ModernProjectForm = () => {
               </div>
             </div>
 
-            <div className="transition-all duration-300 ease-in-out">
+            <div className="transition-all duration-300 ease-in-out min-h-[300px] sm:min-h-[350px] overflow-y-auto">
               {renderStep()}
             </div>
 
-            <div className="flex w-full gap-3 mt-8">
+            <div className="flex w-full gap-3 mt-6 sm:mt-8">
               {step > 1 && (
-                <div
+                <button
+                  type="button"
                   onClick={() => setStep(step - 1)}
-                  className="flex-1 px-4 py-3 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 transition-colors font-medium text-center"
+                  className="flex-1 px-4 py-3 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 transition-colors font-medium text-center text-sm sm:text-base"
                 >
                   Back
-                </div>
+                </button>
               )}
               <button
                 type="button"
-                // onClick={() =>
-                //   step < totalSteps ? setStep(step + 1) : handleSubmit
-                // }
                 className="flex-1 z-10 font-medium"
               >
                 <div
-                  className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 rounded-lg"
-                  onClick={(e) =>
-                    step < totalSteps ? setStep(step + 1) : handleSubmit(e)
-                    // console.log("Clock")
-                  }
+                  className="px-4 sm:px-6 py-3 bg-emerald-500 hover:bg-emerald-600 rounded-lg text-white text-sm sm:text-base"
+                  onClick={(e) => step < totalSteps ? setStep(step + 1) : handleSubmit(e)}
                 >
                   {step === totalSteps ? "Complete" : "Next"}
                 </div>
