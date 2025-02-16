@@ -2,24 +2,27 @@
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/utils";
-import { Search } from "lucide-react";
+import { Search, User } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import MaxWidthWrapper from "../global/max-width-wrapper";
 // import MobileNavbar from "./mobile-navbar";
 import AnimationContainer from "../global/animation-container";
 import Image from "next/image";
-import { useAbstraxionAccount, useModal } from "@burnt-labs/abstraxion";
+import { useAbstraxionAccount, useModal, useAbstraxionSigningClient } from "@burnt-labs/abstraxion";
+import { useRouter } from 'next/navigation';
 
 const SUPER_ADMINS = process.env.NEXT_PUBLIC_SUPER_ADMINS?.split(",") || [];
 
 const Navbar = () => {
+  const router = useRouter();
   const [scroll, setScroll] = useState(false);
   const {
     data: { bech32Address },
     isConnected,
     isConnecting,
   } = useAbstraxionAccount();
+  const { logout } = useAbstraxionSigningClient();
   const [, setShow] = useModal();
 
   const isAdmin = bech32Address && SUPER_ADMINS.includes(bech32Address);
@@ -41,18 +44,22 @@ const Navbar = () => {
   }, []);
 
   // Handle wallet connect/disconnect
-  const handleWalletAction = () => {
+  const handleWalletAction = async () => {
     if (isConnected) {
-      console.log(
-        "Wallet already connected. Handle disconnect manually if needed."
-      );
+      try {
+        await logout?.();
+        localStorage.removeItem("xion-authz-granter-account");
+        router.push('/');
+      } catch (error) {
+        console.error("Error disconnecting wallet:", error);
+      }
     } else {
-      setShow(true); // Open the wallet connection modal
+      setShow(true);
     }
   };
 
   useEffect(() => {
-    async function createUser () {
+    async function createUser() {
       const res = await fetch("/api/upload/user", {
         method: "POST",
         body: JSON.stringify({
@@ -67,7 +74,6 @@ const Navbar = () => {
         return;
 
       createUser();
-      
     }
   }, [isConnected]);
 
@@ -96,30 +102,64 @@ const Navbar = () => {
             </div>
           </Link>
 
-          <div className="flex items-center space-x-4">
-            {/* Admin Panel Button (Only for Super Admins) */}
-            {isAdmin && (
-              <Link href="/admin">
-                <Button className="bg-red-500 text-white px-4 py-2 rounded-lg">
-                  Admin Panel
+          <div className="flex items-center gap-4">
+            {isConnected && (
+              <>
+                {/* Admin Panel Button (Only for Super Admins) */}
+                {isAdmin && (
+                  <Link href="/admin">
+                    <Button 
+                      className="bg-red-500 hover:bg-red-600 text-white rounded-lg h-9 px-3 text-sm"
+                    >
+                      Admin Panel
+                    </Button>
+                  </Link>
+                )}
+
+                {/* Connect Wallet Button */}
+                <Button
+                  className={cn(
+                    buttonVariants({
+                      variant: "primary",
+                      size: scroll ? "sm" : "lg",
+                    }),
+                    "bg-black text-white"
+                  )}
+                  style={{ width: "150px", height: "40px" }}
+                  onClick={handleWalletAction}
+                  disabled={isConnecting}
+                >
+                  {isConnecting ? 'Connecting...' : isConnected ? "Disconnect" : "Connect Wallet"}
                 </Button>
-              </Link>
+
+                {/* Profile Icon */}
+                <Link href="/profile">
+                  <Button 
+                    variant="ghost" 
+                    className="w-10 h-10 p-2.5 bg-emerald-50 hover:bg-emerald-100 rounded-full transition-colors flex items-center justify-center"
+                  >
+                    <User className="w-5 h-5 text-emerald-600 stroke-[2.5px]" />
+                  </Button>
+                </Link>
+              </>
             )}
 
-            {/* Connect Wallet Button */}
-            <Button
-              className={cn(
-                buttonVariants({
-                  variant: "primary",
-                  size: scroll ? "sm" : "lg",
-                }),
-                "bg-black text-white"
-              )}
-              style={{ width: "150px", height: "40px" }}
-              onClick={handleWalletAction}
-            >
-              {isConnected ? "Disconnect" : "Connect Wallet"}
-            </Button>
+            {!isConnected && (
+              <Button
+                className={cn(
+                  buttonVariants({
+                    variant: "primary",
+                    size: scroll ? "sm" : "lg",
+                  }),
+                  "bg-black text-white"
+                )}
+                style={{ width: "150px", height: "40px" }}
+                onClick={handleWalletAction}
+                disabled={isConnecting}
+              >
+                Connect Wallet
+              </Button>
+            )}
           </div>
 
           {/* Mobile Navigation */}
