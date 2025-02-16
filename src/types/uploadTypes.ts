@@ -1,11 +1,9 @@
-interface CustomFormData {
-    [key: string]: string | string[] | null;
-}
-
-interface FileUploadProps {
-    handleFileChange: (e: File | null, field: keyof CustomFormData) => Promise<void>;
+export interface FileUploadProps {
+    handleFileChange: (e: React.ChangeEvent<HTMLInputElement> & { imageUrl?: string, imageUrls?: string[] } | null, field: string) => void;
     titleText: string;
-    multiple: boolean;
-    formField: keyof CustomFormData;
-    formData: CustomFormData;
+    multiple?: boolean;
+    formField: string;
+    formData: {
+        [key: string]: string | string[] | null;
+    };
 }

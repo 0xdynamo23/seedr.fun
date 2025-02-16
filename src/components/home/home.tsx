@@ -57,6 +57,10 @@ const ProjectCard: React.FC<{ project: Project }> = ({ project }) => (
   </div>
 );
 
+interface ApiResponse {
+  success: boolean;
+  data: Project[];
+}
 
 const HeroSection = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -65,10 +69,9 @@ const HeroSection = () => {
     const fetchProjects = async () => {
       try {
         const response = await fetch("/api/getprojects");
-        // if (!response.ok) throw new Error("Failed to fetch projects");
-        const data: Project[] = await response.json();
-        console.log(data);
-        setProjects(data.data);
+        const result: ApiResponse = await response.json();
+        console.log(result);
+        setProjects(result.data);
       } catch (error) {
         console.error("Error fetching projects:", error);
       }

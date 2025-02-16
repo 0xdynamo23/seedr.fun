@@ -28,7 +28,7 @@ const AdminPage = () => {
     } else {
       router.push("/unauthorized"); // Redirect if no wallet found
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     if (isSuperAdmin) fetchProjects();
