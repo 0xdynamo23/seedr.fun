@@ -1,11 +1,10 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Footer from "../navigation/footer";
-import { useState } from "react";
 
 type Project = {
   id: string;
@@ -64,6 +63,7 @@ interface ApiResponse {
 
 const HeroSection = () => {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [isBuilder, setIsBuilder] = useState(true);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -78,6 +78,14 @@ const HeroSection = () => {
     };
 
     fetchProjects();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsBuilder(prev => !prev);
+    }, 2000); // Change every 2 seconds
+
+    return () => clearInterval(interval); // Cleanup on unmount
   }, []);
 
   const [selectedCategory, setSelectedCategory] = useState("Trending");
@@ -104,8 +112,16 @@ const HeroSection = () => {
         <div className="pt-24 max-w-full mx-auto">
           {/* Hero Content */}
           <div className="max-w-2xl mb-16">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4">
-              Support builders you trust
+            <h1 className="text-2xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 flex flex-col items-start">
+              <span className="flex items-center">
+                Support
+                <motion.span
+                  className={`transition-colors duration-500 m-2 ${isBuilder ? 'text-gray-900' : 'text-emerald-500'} block md:inline`}
+                >
+                  {isBuilder ? 'builders' : 'developers'}
+                </motion.span>
+              </span>
+              <span className="text-gray-900">you trust</span>
             </h1>
             <motion.p
               initial={{ opacity: 0, y: 10 }}
