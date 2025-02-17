@@ -47,7 +47,7 @@ const Footer = () => {
               <div className="space-y-2">
                 <h3 className="text-sm text-gray-400 uppercase">Contact us</h3>
                 <a href="mailto:admin@seeder.com" className="text-gray-600 hover:text-gray-900 font-bold transition-colors">
-                  admin@seeder.com
+                  seedr@cyrostudios.com
                 </a>
               </div>
               <div className="flex flex-col gap-3">
