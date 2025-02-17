@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import Navbar from '../navigation/navbar';
 
 // Add a utility function for consistent date formatting
 const formatDate = (dateString: string) => {

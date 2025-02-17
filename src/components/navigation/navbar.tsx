@@ -129,11 +129,11 @@ const Navbar = () => {
                   {isConnecting ? 'Connecting...' : isConnected ? "Disconnect" : "Connect Wallet"}
                 </Button>
 
-                <Link href="/profile">
+                {/* <Link href="/profile">
                   <Button variant="ghost" className="w-10 h-10 p-2.5 bg-emerald-50 hover:bg-emerald-100 rounded-full transition-colors flex items-center justify-center">
                     <User className="w-5 h-5 text-emerald-600 stroke-[2.5px]" />
                   </Button>
-                </Link>
+                </Link> */}
               </>
             )}
 

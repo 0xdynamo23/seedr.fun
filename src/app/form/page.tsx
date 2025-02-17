@@ -1,7 +1,7 @@
 //@ts-nocheck
 "use client";
 import React, { useState, FormEvent } from "react";
-import { X, Plus, Send, Globe } from "lucide-react";
+import { X, Plus, Send, Globe, Trash2 } from "lucide-react";
 import { SiDiscord } from "react-icons/si";
 import { FaXTwitter } from "react-icons/fa6";
 import {
@@ -24,13 +24,12 @@ const ProgressDot: React.FC<ProgressDotProps> = ({
 }: ProgressDotProps) => (
   <div className="">
     <div
-      className={`h-1 rounded-full transition-all duration-300 ${
-        completed
-          ? "bg-emerald-200 w-4"
-          : active
+      className={`h-1 rounded-full transition-all duration-300 ${completed
+        ? "bg-emerald-200 w-4"
+        : active
           ? "bg-emerald-500 w-16"
           : "bg-gray-200 flex-1 w-4"
-      }`}
+        }`}
     />
   </div>
 );
@@ -302,6 +301,19 @@ const ModernProjectForm = () => {
                     <option value="designer">Designer</option>
                     <option value="other">Other</option>
                   </select>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (form.team.length > 1) {
+                        const newTeam = form.team.filter((_, i) => i !== index);
+                        setForm((prev) => ({ ...prev, team: newTeam }));
+                      }
+                    }}
+                    className="text-red-500 hover:text-red-600 transition-colors text-sm"
+                    title="Remove team member"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
                 </div>
               ))}
             </div>
@@ -355,13 +367,13 @@ const ModernProjectForm = () => {
                   )}
                   <div className="w-full flex gap-2 items-center pl-10 pr-4 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-black">
                     {link?.prompt}
-                  <input 
-                    type="text" 
-                    className="py-1 w-full outline-none"
-                    name={`links.${link.platform}`}
-                    value={form.links[link.platform]}
-                    onInput={handleChange}
-                  />
+                    <input
+                      type="text"
+                      className="py-1 w-full outline-none"
+                      name={`links.${link.platform}`}
+                      value={form.links[link.platform]}
+                      onInput={handleChange}
+                    />
                   </div>
                 </div>
               ))}
@@ -471,7 +483,7 @@ const ModernProjectForm = () => {
     e.preventDefault();
 
     let projectPics = form.projectPics;
-    if (typeof(form.projectPics) === "string") {
+    if (typeof (form.projectPics) === "string") {
       projectPics = [form.projectPics];
     }
 

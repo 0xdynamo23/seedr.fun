@@ -157,7 +157,7 @@ const ProductPage = ({ params }: { params: { id: string } }) => {
 
   if (!project) {
     return <div>Loading...</div>;
-  }
+  } 
 
   return (
     <div className="w-screen">
