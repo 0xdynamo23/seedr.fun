@@ -97,11 +97,13 @@ html, body {
 ::-webkit-scrollbar {
   width: 6px;
   scrollbar-color: #262626;
+  display: none;
 }
 
 ::-webkit-scrollbar-thumb {
   background-color: #262626;
   border-radius: 3px;
+  display: none;
 }
 
 ::-webkit-scrollbar-track {

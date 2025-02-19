@@ -1,6 +1,7 @@
 import { Footer, Navbar, Providers } from "@/components";
 // import AuthProvider from "@/components/authProvider";
 import { Toaster } from "@/components/ui/sonner";
+import { Toaster as HotToast } from "react-hot-toast";
 import "@/styles/globals.css";
 import { aeonik, cn, inter } from "@/utils";
 import { Metadata } from "next";
@@ -27,6 +28,7 @@ export default function RootLayout({
             >
                 <Providers>
                     <Toaster richColors theme="dark" position="top-right" />
+                    <HotToast />
                     {typeof window !== 'undefined' && window.location.pathname !== '/form' && <Navbar />}
                     {children}
                     {typeof window !== 'undefined' && window.location.pathname !== '/form' && <Footer />}

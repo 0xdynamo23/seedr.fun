@@ -20,9 +20,12 @@ export async function POST(request: Request) {
     // Ensure Prisma is properly connected
     await prisma.$connect();
     
-    // Fetch the project
+    // Fetch the project along with links
     const project = await prisma.project.findUnique({
       where: { id },
+      include: {
+        links: true,
+      },
     });
 
     if (!project) {

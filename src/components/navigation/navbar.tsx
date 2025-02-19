@@ -11,6 +11,7 @@ import AnimationContainer from "../global/animation-container";
 import Image from "next/image";
 import { useAbstraxionAccount, useModal, useAbstraxionSigningClient } from "@burnt-labs/abstraxion";
 import { useRouter } from 'next/navigation';
+import { FaSearch } from 'react-icons/fa';
 
 const SUPER_ADMINS = process.env.NEXT_PUBLIC_SUPER_ADMINS?.split(",") || [];
 
@@ -102,18 +103,53 @@ const Navbar = () => {
             </div>
           </Link>
 
-          {/* Desktop Navigation - Hidden on Mobile */}
-          <div className="hidden lg:flex items-center gap-4">
-            {isConnected && (
-              <>
-                {isAdmin && (
-                  <Link href="/admin">
-                    <Button className="bg-red-500 hover:bg-red-600 text-white rounded-lg h-9 px-3 text-sm">
-                      Admin Panel
-                    </Button>
-                  </Link>
-                )}
+          <div className="flex gap-2">
+            {/* Search Bar */}
+            {/* <div className="flex items-center pl-2 border border-gray-300 rounded-lg bg-white/80">
+              <FaSearch className="text-gray-500  " />
+              <input
+                type="text"
+                placeholder="Search..."
+                className="text-black py-2 pl-2 pr-4 rounded-r-lg bg-transparent focus:outline-none"
+              />
+            </div> */}
 
+            {/* Desktop Navigation - Hidden on Mobile */}
+            <div className="hidden lg:flex items-center gap-4">
+              {isConnected && (
+                <>
+                  {isAdmin && (
+                    <Link href="/admin">
+                      <Button className="bg-red-500 hover:bg-red-600 text-white rounded-lg h-9 px-3 text-sm">
+                        Admin Panel
+                      </Button>
+                    </Link>
+                  )}
+
+                  <Button
+                    className={cn(
+                      buttonVariants({
+                        variant: "primary",
+                        size: scroll ? "sm" : "lg",
+                      }),
+                      "bg-black text-white"
+                    )}
+                    style={{ width: "150px", height: "40px" }}
+                    onClick={handleWalletAction}
+                    disabled={isConnecting}
+                  >
+                    {isConnecting ? 'Connecting...' : isConnected ? "Disconnect" : "Connect Wallet"}
+                  </Button>
+
+                  {/* <Link href="/profile">
+                  <Button variant="ghost" className="w-10 h-10 p-2.5 bg-emerald-50 hover:bg-emerald-100 rounded-full transition-colors flex items-center justify-center">
+                  <User className="w-5 h-5 text-emerald-600 stroke-[2.5px]" />
+                  </Button>
+                  </Link> */}
+                </>
+              )}
+
+              {!isConnected && (
                 <Button
                   className={cn(
                     buttonVariants({
@@ -126,37 +162,14 @@ const Navbar = () => {
                   onClick={handleWalletAction}
                   disabled={isConnecting}
                 >
-                  {isConnecting ? 'Connecting...' : isConnected ? "Disconnect" : "Connect Wallet"}
+                  Connect Wallet
                 </Button>
+              )}
+            </div>
 
-                {/* <Link href="/profile">
-                  <Button variant="ghost" className="w-10 h-10 p-2.5 bg-emerald-50 hover:bg-emerald-100 rounded-full transition-colors flex items-center justify-center">
-                    <User className="w-5 h-5 text-emerald-600 stroke-[2.5px]" />
-                  </Button>
-                </Link> */}
-              </>
-            )}
-
-            {!isConnected && (
-              <Button
-                className={cn(
-                  buttonVariants({
-                    variant: "primary",
-                    size: scroll ? "sm" : "lg",
-                  }),
-                  "bg-black text-white"
-                )}
-                style={{ width: "150px", height: "40px" }}
-                onClick={handleWalletAction}
-                disabled={isConnecting}
-              >
-                Connect Wallet
-              </Button>
-            )}
+            {/* Mobile Navigation */}
+            <MobileNavbar />
           </div>
-
-          {/* Mobile Navigation */}
-          <MobileNavbar />
         </MaxWidthWrapper>
       </AnimationContainer>
     </header>

@@ -31,6 +31,7 @@ const AdminPage = () => {
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [filter, setFilter] = useState<string>("ALL");
 
   useEffect(() => {
     const storedWallet = localStorage.getItem("xion-authz-granter-account");
@@ -66,6 +67,8 @@ const AdminPage = () => {
     return <p className="text-center text-red-500 text-lg">Access Denied</p>;
   }
 
+  const filteredProjects = filter === "ALL" ? projects : projects.filter(project => project.status === filter);
+
   return (
     <>
       <Navbar />
@@ -74,12 +77,19 @@ const AdminPage = () => {
           <div className="p-6">
             <h1 className="text-3xl font-bold text-black mb-8">Admin Dashboard</h1>
 
+            <div className="mb-4">
+              <Button onClick={() => setFilter("ALL")} className={filter === "ALL" ? "bg-emerald-500 text-white" : ""}>All</Button>
+              <Button onClick={() => setFilter("ACCEPTED")} className={filter === "ACCEPTED" ? "bg-emerald-500 text-white" : ""}>Accepted</Button>
+              <Button onClick={() => setFilter("REJECTED")} className={filter === "REJECTED" ? "bg-emerald-500 text-white" : ""}>Rejected</Button>
+              <Button onClick={() => setFilter("PENDING")} className={filter === "PENDING" ? "bg-emerald-500 text-white" : ""}>Pending</Button>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Projects List */}
               <div className="lg:col-span-1 bg-gray-50 rounded-lg shadow-md p-4">
                 <h2 className="text-xl font-semibold mb-4 text-black">Projects</h2>
                 <div className="space-y-2">
-                  {projects.map((project) => (
+                  {filteredProjects.map((project) => (
                     <div
                       key={project.id}
                       onClick={() => setSelectedProject(project)}

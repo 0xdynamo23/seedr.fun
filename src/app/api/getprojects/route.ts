@@ -10,7 +10,13 @@ export type Project = {
   description: string;
   raised?: number; // Optional
   contributors?: number;
-  projectPics?: string[]
+  projectPics?: string[];
+  links?: {
+    telegram: string | null; // Allow null
+    x: string | null;        // Allow null
+    discord: string | null;  // Allow null
+    website: string | null;  // Allow null
+  }[]; // Update to reflect the array of links
 };
 
 // API Route to get projects
@@ -25,7 +31,14 @@ export async function GET(req: NextRequest) {
         logo: true,
         description: true,
         projectPics: true,
-
+        links: { // Include links relation
+          select: {
+            telegram: true,
+            x: true,
+            discord: true,
+            website: true,
+          },
+        },
       },
       where: {
         status: "ACCEPTED",
