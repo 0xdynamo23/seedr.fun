@@ -177,11 +177,11 @@ const ProductPage = ({ params }: { params: { id: string } }) => {
   return (
     <>
       <Navbar />
-      <div className="w-screen relative  pl-5 md:pl-12 lg:pl-24 pt-6">
+      <div className="w-screen relative  pl-5 md:pl-12 lg:pl-24 pt-6 mt-20">
         <div className="py-6 bg-white rounded-lg w-full h-full">
           {/* Project Header */}
           <div className="flex items-center space-x-3 mt-10 pr-5 md:pr-12 lg:pr-24">
-            <div className="relative w-10 h-10">
+            <div className="relative w-12 h-12">
               <Image
                 src={project?.logo}
                 alt="logo"
@@ -189,35 +189,39 @@ const ProductPage = ({ params }: { params: { id: string } }) => {
                 className="object-contain"
               />
             </div>
-            <div>
-              <h1 className="text-2xl font-semibold text-black">
-                {project?.name}
-              </h1>
-              <p className="text-gray-600">{project?.tagline}</p>
-            </div>
+            {/* <div> */}
+            <h1 className="text-5xl font-semibold text-[#303339] m-2 mb-3">
+              {project?.name}
+            </h1>
+            {/* </div> */}
           </div>
+          <p className="text-gray-600 text-[19px]">{project?.tagline}</p>
 
           {/* Contributors & Raised */}
-          <div className="mt-3 text-gray-700">
+          <div className="mt-3 text-[17px] text-[#6B7280]">
             <p>
-              <span className="font-semibold">1</span> Contributor ·{" "}
-              <span className="font-semibold">$0</span> Raised
+              <span className="font-semibold text-[#6B7280]">1</span> Contributor ·{" "}
+              <span className="font-semibold text-[#6B7280]">$0</span> Raised
             </p>
           </div>
 
           {/* Buttons Section */}
-          <div className="mt-3 flex items-center space-x-2">
+          <div className="mt-8 flex items-center space-x-2">
             <button
               onClick={handleBelieveClick}
-              className="bg-green-500 text-white px-4 py-2 rounded-lg flex items-center"
+              className="bg-green-500 text-white px-3 py-2 rounded-[10px] flex items-center gap-16"
             >
-              <FaDollarSign className="mr-2" /> Believe{" "}
+              <div className="flex items-center">
+                <FaDollarSign className="mr-2" /> Believe{" "}
+              </div>
               <FaArrowRight className="ml-2 mr-2" />
             </button>
             <button className="p-2 rounded-lg text-black flex items-center">
               <BiBookmark className="text-xl" />
             </button>
           </div>
+
+          <p className="text-[#6B7280] mt-5 mb-7 text-[14px]">view project</p>
 
           {/* Project Images Container */}
           <div className="mt-6">
@@ -228,13 +232,12 @@ const ProductPage = ({ params }: { params: { id: string } }) => {
                   className="relative rounded-[18px] overflow-hidden aspect-video h-full shrink-0"
                 // relative min-w-[883px] lg:min-w-[720px] xl:min-w-[883px] 2xl:min-w-[1000px] h-[450px] lg:h-[500px] xl:h-[550px] 2xl:h-[600px] bg-gray-100
                 >
-                  <img
+                  <Image
                     src={pic}
                     alt={`${project.name} pic ${index + 1}`}
-                    // fill
                     className="object-cover hover:scale-105 transition-transform duration-300 aspect-video w-full h-full"
-                  // sizes="(max-width: 768px) 100vw, (max-width: 1024px) 720px, (max-width: 1280px) 883px, 1000px"
-                  // priority={index === 0}
+                    width={500}
+                    height={300}
                   />
                 </div>
               ))}
@@ -243,7 +246,7 @@ const ProductPage = ({ params }: { params: { id: string } }) => {
 
           {/* About Section */}
           <div className="mt-6 max-w-screen-lg">
-            <h2 className="text-xl font-semibold">About {project?.name}</h2>
+            <h2 className="text-xl font-semibold text-[#303339] mb-4 mt-11">About {project?.name}</h2>
             <p className="text-gray-700 mt-2">{project?.description}</p>
           </div>
 
@@ -251,7 +254,7 @@ const ProductPage = ({ params }: { params: { id: string } }) => {
           {project.links && project.links.length > 0 && (
             <div className="mt-4">
               <h3 className="text-lg  text-black mt-10 mb-2 font-semibold">Socials</h3>
-              <div className="flex flex gap-2 mt-2">
+              <div className="flex gap-2 mt-2">
                 {project.links.map((link, index) => (
                   link.telegram && (
                     <a key={index} href={`https://t.me/${link.telegram}`} target="_blank" rel="noopener noreferrer" className="bg-gray-100 border border-gray-200 rounded-lg p-2 aspect-square flex items-center justify-center">
@@ -285,24 +288,21 @@ const ProductPage = ({ params }: { params: { id: string } }) => {
             </div>
           )}
 
-          Categories
-          {/* <div className="mt-4">
-            <h3 className="text-lg font-semibold">Categories</h3>
-            <div className="flex space-x-2 mt-2">
-              <span className="px-3 py-1 bg-gray-200 rounded-lg text-sm">
+          <h3 className="text-lg  text-black mt-10 font-semibold mb-2">Tags</h3>
+            <div className="flex gap-2">
+              <span className=" border border-gray-400 px-3 py-1 rounded-full text-black text-sm">
                 {project?.category}
               </span>
-            </div>
-          </div> */}
+          </div>
 
-          {/* Timestamp
+           {/* Timestamp */}
           <div className="mt-6 text-gray-500 text-sm">
           Created: {new Date(project?.timestamp).toLocaleString()}
-        </div> */}
+        </div> 
         </div>
-
+        <hr className="mt-10 w-full max-w-screen-lg"></hr>
         {/* Comments Section */}
-        <div className="mt-8 p-6 bg-white rounded-lg shadow-md max-w-screen-lg">
+        <div className="mt-8 p-6 bg-white rounded-lg max-w-screen-lg">
           <h2 className="text-xl text-black font-semibold mb-4">Comments</h2>
 
           {/* Add Comment Form */}

@@ -114,12 +114,7 @@ const HeroSection = () => {
           <div className="max-w-2xl mb-16">
             <h1 className="text-2xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 flex flex-col items-start">
               <span className="flex items-center">
-                Support
-                <motion.span
-                  className={`transition-colors duration-500 m-2 ${isBuilder ? 'text-gray-900' : 'text-emerald-500'} block md:inline`}
-                >
-                  {isBuilder ? 'builders' : 'developers'}
-                </motion.span>
+                Support Builders
               </span>
               <span className="text-gray-900">you trust</span>
             </h1>
