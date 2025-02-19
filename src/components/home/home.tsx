@@ -132,13 +132,13 @@ const HeroSection = () => {
               contribute through Seeder rounds to bring impactful ideas to life.
             </motion.p>
 
-            <Link href="/start">
+            <Link href="/form">
               <motion.button
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-green-500 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2"
               >
-                Start believing
+                Start posting
                 <svg
                   className="w-4 h-4"
                   viewBox="0 0 24 24"
