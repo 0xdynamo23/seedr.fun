@@ -326,8 +326,22 @@ const ProductPage = ({ params }: { params: { id: string } }) => {
 
            {/* Timestamp */}
           <div className="mt-6 text-gray-500 text-sm">
-          Created: {new Date(project?.timestamp).toLocaleString()}
-        </div> 
+            {project?.createdAt ? (
+              <>
+                Created: {new Date(project.createdAt).toLocaleString("en-US", {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'short',
+                  day: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: true
+                }).replace(',', ' |')}
+              </>
+            ) : (
+              <span className="text-red-500">Invalid date</span>
+            )}
+          </div> 
         </div>
         <hr className="mt-10 w-full max-w-screen-lg"></hr>
         {/* Comments Section */}
