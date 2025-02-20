@@ -31,6 +31,7 @@ type Project = {
     website: string | null;
   }[];
   timestamp: string;
+  createdAt: string;
 };
 
 interface Comment {

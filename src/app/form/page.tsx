@@ -1,7 +1,7 @@
 //@ts-nocheck
 "use client";
 import React, { useState, FormEvent } from "react";
-import { X, Plus, Send, Globe } from "lucide-react";
+import { X, Plus, Send, Globe, Trash2 } from "lucide-react";
 import { SiDiscord } from "react-icons/si";
 import { FaXTwitter } from "react-icons/fa6";
 import { toast } from "react-hot-toast";
@@ -300,66 +300,59 @@ const ModernProjectForm = () => {
 
       case 5:
         return (
-          <div className="space-y-4 max-h-[350px] sm:max-h-[400px] overflow-y-auto px-1">
-            <p className="text-black font-semibold text-sm sm:text-base sticky top-0 bg-white py-2 z-10">
-              Add Team <span className="text-red-500">*</span>
+          <div className="space-y-4">
+            <p className="text-black font-semibold">
+              Add Team Members <span className="text-red-500">*</span>
             </p>
-            <div className="space-y-3">
-              {form.team.map((member, index) => (
-                <div key={index} className="flex flex-col sm:flex-row gap-3 sm:items-center p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-medium text-lg shrink-0">
-                      {member.avatar ? (
-                        <Image
-                          src={URL.createObjectURL(member.avatar)}
-                          alt="Avatar"
-                          width={40}
-                          height={40}
-                          className="w-full h-full rounded-full object-cover"
-                        />
-                      ) : (
-                        <span>
-                          {member.name ? member.name.charAt(0).toUpperCase() : "U"}
-                        </span>
-                      )}
-                    </div>
-                    <input
-                      type="text"
-                      placeholder="Name"
-                      value={member.name}
-                      onChange={(e) => {
-                        const newTeam = [...form.team];
-                        newTeam[index].name = e.target.value;
-                        setForm((prev) => ({ ...prev, team: newTeam }));
-                      }}
-                      className="flex-1 px-3 py-2 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-black text-sm"
-                    />
+            {form.team.map((member, index) => (
+              <div key={index} className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-16 h-7 rounded-full bg-gray-200 flex items-center overflow-hidden justify-center text-gray-500 font-medium text-lg">
+                    {member.name ? member.name.charAt(0).toUpperCase() : "U"}
                   </div>
-                  <select
+                  <input
+                    type="text"
+                    placeholder="Name"
+                    value={member.name}
+                    onChange={(e) => {
+                      const newTeam = [...form.team];
+                      newTeam[index].name = e.target.value;
+                      setForm((prev) => ({ ...prev, team: newTeam }));
+                    }}
+                    className="w-full px-2 py-2 border text-black border-gray-200 rounded-lg"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Position"
                     value={member.position}
                     onChange={(e) => {
                       const newTeam = [...form.team];
                       newTeam[index].position = e.target.value;
                       setForm((prev) => ({ ...prev, team: newTeam }));
                     }}
-                    className="px-3 py-2 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-black text-sm w-full sm:w-auto"
-                  >
-                    <option value="">Select Position</option>
-                    <option value="founder">Founder</option>
-                    <option value="developer">Developer</option>
-                    <option value="designer">Designer</option>
-                    <option value="other">Other</option>
-                  </select>
+                    className="w-full px-3 py-2 border text-black border-gray-200 rounded-lg"
+                  />
                 </div>
-              ))}
-            </div>
+                {form.team.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newTeam = form.team.filter((_, i) => i !== index);
+                      setForm((prev) => ({ ...prev, team: newTeam }));
+                    }}
+                    className="ml-2 text-red-500 hover:text-red-700"
+                  >
+                    <Trash2 size={24} />
+                  </button>
+                )}
+              </div>
+            ))}
             <button
               type="button"
               onClick={addTeamMember}
-              className="text-emerald-500 flex items-center gap-2 hover:text-emerald-600 transition-colors text-sm"
+              className="mt-4 px-4 py-2 text-base font-poppins text-emerald-500 rounded-lg"
             >
-              <Plus size={16} />
-              Add another member
+              + Add another members
             </button>
           </div>
         );

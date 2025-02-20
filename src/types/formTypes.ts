@@ -34,3 +34,22 @@ export interface FormData {
 export type FormChangeEvent = ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>;
 export type FileChangeEvent = ChangeEvent<HTMLInputElement>;
 export type FormSubmitEvent = FormEvent<HTMLFormElement>;
+
+export type Project = {
+  id: string;
+  name: string;
+  tagline: string;
+  description: string;
+  raised: number;
+  contributors: number;
+  category: string;
+  logo: string;
+  projectPics?: string[];
+  links?: {
+    telegram: string | null;
+    x: string | null;
+    discord: string | null;
+    website: string | null;
+  }[];
+  createdAt: string;
+};

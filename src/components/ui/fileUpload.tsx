@@ -100,7 +100,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                         <>
                             <Upload className="mx-auto h-12 w-12 text-gray-400 mb-2" />
                             <p className="text-black">
-                                Drop your {multiple ? 'files' : 'file'} here or <span className="text-emerald-500">browse</span>
+                                Drop your {multiple ? <span className="text-red-500">2* banner</span>: 'file'} here or <span className="text-emerald-500">browse</span>
                             </p>
                             <p className="text-sm text-gray-400 mt-1">Maximum size 20MB {multiple && '(Up to 2 images)'}</p>
                         </>
