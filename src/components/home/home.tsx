@@ -49,7 +49,7 @@ const ProjectCard: React.FC<{ project: Project }> = ({ project }) => (
         </span>
         <span className="text-sm font-medium">${project.raised ?? 0} Raised</span>
       </div>
-      <Link href={`/project/${project.id}`} className="text-sm text-blue-500 hover:underline">
+      <Link href={`/project/${project.id}`} className="text-sm text-emerald-500 hover:underline">
         View Project →
       </Link>
     </div>
