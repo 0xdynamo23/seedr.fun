@@ -560,7 +560,7 @@ const ModernProjectForm = () => {
       const data = await res.json();
 
       if (data.success) {
-        toast.success("Project submitted successfully for review!");
+        toast.success("Project submitted successfully for review! Wait until admins approve it");
         setStep(1);
         setForm({
           name: "",
