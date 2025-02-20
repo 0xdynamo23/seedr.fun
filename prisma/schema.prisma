@@ -31,6 +31,7 @@ model Project {
   status       ProjectStatus  @default(PENDING)
 
   links        Links[]
+  comments     Comment[]      @relation("ProjectComments")
 }
 
 model Links {
@@ -41,6 +42,14 @@ model Links {
   website   String?
   projectId String
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  text      String
+  timestamp DateTime @default(now())
+  projectId String
+  project   Project  @relation("ProjectComments", fields: [projectId], references: [id], onDelete: Cascade) // Update this line
 }
 
 enum ProjectStatus {

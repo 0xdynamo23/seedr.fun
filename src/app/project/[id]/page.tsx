@@ -7,6 +7,8 @@ import { X, Plus, Send, Globe, Trash2 } from "lucide-react";
 import { SiDiscord } from "react-icons/si";
 import { FaDiscord, FaGlobe, FaTelegram, FaXTwitter } from "react-icons/fa6";
 import { Footer } from "@/components"
+import { toast } from "react-hot-toast";
+import { FaUserAstronaut } from "react-icons/fa";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -83,7 +85,7 @@ const PaymentModal = ({
             </div>
 
             <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg mb-6">
-              <div className="relative w-12 h-12">
+              <div className="relative w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20">
                 <Image
                   src={project.logo}
                   alt={project.name}
@@ -158,8 +160,18 @@ const ProductPage = ({ params }: { params: { id: string } }) => {
         const response = await axios.post(`/api/product`, { id: params.id });
         console.log(response.data);
         setProject(response.data);
+        fetchComments(); // Fetch comments when the project is fetched
       } catch (error) {
         console.error("Error fetching project:", error);
+      }
+    };
+
+    const fetchComments = async () => {
+      try {
+        const response = await axios.get(`/api/comments?projectId=${params.id}`);
+        setComments(response.data);
+      } catch (error) {
+        console.error("Error fetching comments:", error);
       }
     };
 
@@ -172,6 +184,23 @@ const ProductPage = ({ params }: { params: { id: string } }) => {
 
   const handleBelieveClick = () => {
     setIsComingSoon(true);
+  };
+
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return;
+
+    const commentData = {
+      text: newComment,
+      projectId: project?.id,
+    };
+
+    try {
+      const response = await axios.post('/api/comments', commentData);
+      setComments((prev) => [response.data, ...prev]); // Add new comment to the state
+      setNewComment(""); // Clear the input
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    }
   };
 
   return (
@@ -190,7 +219,7 @@ const ProductPage = ({ params }: { params: { id: string } }) => {
               />
             </div>
             {/* <div> */}
-            <h1 className="text-5xl font-semibold text-[#303339] m-2 mb-3">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-[#303339] m-2 mb-3">
               {project?.name}
             </h1>
             {/* </div> */}
@@ -306,26 +335,16 @@ const ProductPage = ({ params }: { params: { id: string } }) => {
           <h2 className="text-xl text-black font-semibold mb-4">Comments</h2>
 
           {/* Add Comment Form */}
-          <div className="mb-6 flex gap-3 w-full">
+          <div className="mb-6 flex flex-col sm:flex-row gap-3 w-full">
             <textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Share your views..."
-              className="w-[714px]  grow p-3 bg-[#F8F8F8] text-black rounded-lg focus:outline-none resize-none"
+              className="w-full p-3 bg-[#F8F8F8] text-black rounded-lg focus:outline-none resize-none"
               rows={1}
             />
             <button
-              onClick={() => {
-                if (!newComment.trim()) return;
-                const newCommentObj = {
-                  id: Date.now(),
-                  text: newComment,
-                  author: "Username user",
-                  timestamp: new Date().toISOString(),
-                };
-                setComments((prev) => [newCommentObj, ...prev]);
-                setNewComment("");
-              }}
+              onClick={handleAddComment}
               className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors whitespace-nowrap"
             >
               Add comment
@@ -342,13 +361,8 @@ const ProductPage = ({ params }: { params: { id: string } }) => {
               comments.map((comment) => (
                 <div key={comment.id} className="flex items-start gap-3">
                   {/* User Avatar */}
-                  <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
-                    <Image
-                      src="/default-avatar.png"
-                      alt="user avatar"
-                      width={32}
-                      height={32}
-                    />
+                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                    <FaUserAstronaut className="text-gray-500" size={32} />
                   </div>
 
                   {/* Comment Content */}
@@ -359,7 +373,7 @@ const ProductPage = ({ params }: { params: { id: string } }) => {
                         {Math.floor((Date.now() - new Date(comment.timestamp).getTime()) / (1000 * 60))}m
                       </span>
                     </div>
-                    <p className="text-gray-600">{comment.text}</p>
+                    <p className="text-gray-600">{comment.text.replace(/'/g, "&apos;")}</p>
                   </div>
 
                   {/* Reply Button */}

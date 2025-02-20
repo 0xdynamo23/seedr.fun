@@ -17,6 +17,7 @@ import {
 import FileUpload from "@/components/ui/fileUpload";
 import { MaxWidthWrapper } from "@/components";
 import { platform } from "os";
+import Image from "next/image";
 // import X from "../../../public/icons/x.svg";
 
 const ProgressDot: React.FC<ProgressDotProps> = ({
@@ -296,9 +297,11 @@ const ModernProjectForm = () => {
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-medium text-lg shrink-0">
                       {member.avatar ? (
-                        <img
+                        <Image
                           src={URL.createObjectURL(member.avatar)}
                           alt="Avatar"
+                          width={40}
+                          height={40}
                           className="w-full h-full rounded-full object-cover"
                         />
                       ) : (
@@ -390,7 +393,7 @@ const ModernProjectForm = () => {
                   <input 
                     type="text" 
                     className="py-1 w-full outline-none"
-                    name={`links.${link.platform}`}
+                    name={`links.${link.platform.replace(/'/g, "&#39;")}`}
                     value={form.links[link.platform]}
                     onInput={handleChange}
                   />
@@ -532,39 +535,47 @@ const ModernProjectForm = () => {
       ownerId: localStorage.getItem("xion-authz-granter-account") || null,
     };
 
-    const res = await fetch("/api/upload/project", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData), // Assuming 'form' contains project data
-    });
+    try {
+      const res = await fetch("/api/upload/project", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData), // Assuming 'form' contains project data
+      });
 
-    const data = await res.json();
+      if (!res.ok) {
+        // If the response is not ok, throw an error
+        throw new Error("Network response was not ok");
+      }
 
-    toast.success("Project submitted successfully for review!");
-    setStep(1);
-    setForm({
-      name: "",
-      tagline: "",
-      category: "",
-      logo: null,
-      projectPics: null,
-      team: [{ name: "", position: "", avatar: null }],
-      contactEmail: "",
-      links: {
-        x: "",
-        telegram: "",
-        discord: "",
-        website: "",
-      },
-      description: "",
-    });
+      const data = await res.json();
 
-
-    // if (data.success) {
-    //   alert("Project uploaded successfully!");
-    // } else {
-    //   alert("Error: " + data.error);
-    // }
+      if (data.success) {
+        toast.success("Project submitted successfully for review!");
+        setStep(1);
+        setForm({
+          name: "",
+          tagline: "",
+          category: "",
+          logo: null,
+          projectPics: null,
+          team: [{ name: "", position: "", avatar: null }],
+          contactEmail: "",
+          links: {
+            x: "",
+            telegram: "",
+            discord: "",
+            website: "",
+          },
+          description: "",
+        });
+      } else {
+        toast.error("Error: " + data.error);
+      }
+    } catch (error) {
+      // Handle the error and show a toast notification
+      toast.error("Error! In submitting, please try again.");
+      console.error("Submission error:", error);
+    }
   };
 
   return (
