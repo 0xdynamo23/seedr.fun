@@ -172,9 +172,6 @@ const ModernProjectForm = () => {
       setStep(step + 1);
     } else {
       handleSubmit();
-      setTimeout(() => {
-        router.push("/home");
-      }, 4000);
     }
   }
 
@@ -581,6 +578,11 @@ const ModernProjectForm = () => {
           },
           description: "",
         });
+
+        // Redirect to the main page after a successful submission
+        setTimeout(() => {
+          router.push("/"); // Redirect to the main page
+        }, 4000);
       } else {
         toast.error("Error: " + data.error);
       }
@@ -640,6 +642,7 @@ const ModernProjectForm = () => {
               <button
                 type="button"
                 className="flex-1 z-10 font-medium"
+                // onClick={() => router.push("/")}
               >
                 <div
                   className="px-4 sm:px-6 py-3 bg-emerald-500 hover:bg-emerald-600 rounded-lg text-white text-sm sm:text-base"
