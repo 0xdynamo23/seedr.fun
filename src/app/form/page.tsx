@@ -26,13 +26,12 @@ const ProgressDot: React.FC<ProgressDotProps> = ({
 }: ProgressDotProps) => (
   <div className="">
     <div
-      className={`h-1 rounded-full transition-all duration-300 ${
-        completed
-          ? "bg-emerald-200 w-4"
-          : active
+      className={`h-1 rounded-full transition-all duration-300 ${completed
+        ? "bg-emerald-200 w-4"
+        : active
           ? "bg-emerald-500 w-16"
           : "bg-gray-200 flex-1 w-4"
-      }`}
+        }`}
     />
   </div>
 );
@@ -191,7 +190,8 @@ const ModernProjectForm = () => {
         return form.description;
       default:
         return false;
-    }}
+    }
+  }
 
   const addTeamMember = () => {
     setForm((prev) => ({
@@ -207,7 +207,7 @@ const ModernProjectForm = () => {
           <div className="space-y-6">
             <div>
               <p className="font-semibold text-black px-2 font-poppins mb-2 text-sm sm:text-base">
-                Project name
+                Project name <span className="text-red-500">*</span>
               </p>
               <input
                 type="text"
@@ -220,7 +220,7 @@ const ModernProjectForm = () => {
 
             <div>
               <p className="font-semibold text-black px-2 font-poppins mb-2 text-sm sm:text-base">
-                Short tagline
+                Short tagline <span className="text-red-500">*</span>
               </p>
               <input
                 type="text"
@@ -236,7 +236,9 @@ const ModernProjectForm = () => {
       case 2:
         return (
           <div className="space-y-4">
-            <p className="text-black font-semibold font-poppins text-sm sm:text-base">Categories</p>
+            <p className="text-black font-semibold">
+              Categories <span className="text-red-500">*</span>
+            </p>
             <div className="relative">
               <select
                 name="category"
@@ -262,6 +264,9 @@ const ModernProjectForm = () => {
       case 3:
         return (
           <div className="space-y-6 h-[300px]">
+            <p className="font-semibold text-black">
+              Upload Logo <span className="text-red-500">*</span>
+            </p>
             <FileUpload
               key="logoInput"
               titleText="Upload logo"
@@ -276,6 +281,9 @@ const ModernProjectForm = () => {
       case 4:
         return (
           <div className="space-y-6 h-[300px]">
+            <p className="font-semibold text-black">
+              Upload Pictures <span className="text-red-500">*</span>
+            </p>
             <FileUpload
               key="pictureInput"
               titleText="Upload Pictures"
@@ -290,7 +298,9 @@ const ModernProjectForm = () => {
       case 5:
         return (
           <div className="space-y-4 max-h-[350px] sm:max-h-[400px] overflow-y-auto px-1">
-            <p className="text-black font-semibold text-sm sm:text-base sticky top-0 bg-white py-2 z-10">Add team</p>
+            <p className="text-black font-semibold text-sm sm:text-base sticky top-0 bg-white py-2 z-10">
+              Add Team <span className="text-red-500">*</span>
+            </p>
             <div className="space-y-3">
               {form.team.map((member, index) => (
                 <div key={index} className="flex flex-col sm:flex-row gap-3 sm:items-center p-3 bg-gray-50 rounded-lg">
@@ -354,7 +364,9 @@ const ModernProjectForm = () => {
       case 6:
         return (
           <div className="space-y-4">
-            <p className="text-black font-semibold">Contact Email</p>
+            <p className="text-black font-semibold">
+              Contact Email <span className="text-red-500">*</span>
+            </p>
             <input
               type="email"
               name="contactEmail"
@@ -364,7 +376,9 @@ const ModernProjectForm = () => {
               className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-black"
             />
             <div className="space-y-3">
-              <p className="font-semibold text-black">Other Links</p>
+              <p className="font-semibold text-black">
+                Other Links <span className="text-red-500">*</span>
+              </p>
               {links.map((link, index) => (
                 <div key={index} className="relative flex items-center gap-2">
                   {link.platform === "twitter" && (
@@ -390,13 +404,13 @@ const ModernProjectForm = () => {
                   )}
                   <div className="w-full flex gap-2 items-center pl-10 pr-4 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-black">
                     {link?.prompt}
-                  <input 
-                    type="text" 
-                    className="py-1 w-full outline-none"
-                    name={`links.${link.platform.replace(/'/g, "&#39;")}`}
-                    value={form.links[link.platform]}
-                    onInput={handleChange}
-                  />
+                    <input
+                      type="text"
+                      className="py-1 w-full outline-none"
+                      name={`links.${link.platform.replace(/'/g, "&#39;")}`}
+                      value={form.links[link.platform]}
+                      onInput={handleChange}
+                    />
                   </div>
                 </div>
               ))}
@@ -526,7 +540,7 @@ const ModernProjectForm = () => {
     // toast.loading("Submitting project...");
 
     let projectPics = form.projectPics;
-    if (typeof(form.projectPics) === "string") {
+    if (typeof (form.projectPics) === "string") {
       projectPics = [form.projectPics];
     }
 
@@ -630,7 +644,7 @@ const ModernProjectForm = () => {
                 <div
                   className="px-4 sm:px-6 py-3 bg-emerald-500 hover:bg-emerald-600 rounded-lg text-white text-sm sm:text-base"
                   onClick={handleNext}
-                  // onClick={(e) => step < totalSteps ? setStep(step + 1) : handleSubmit(e)}
+                // onClick={(e) => step < totalSteps ? setStep(step + 1) : handleSubmit(e)}
                 >
                   {step === totalSteps ? "Complete" : "Next"}
                 </div>
