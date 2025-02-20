@@ -169,6 +169,9 @@ const ModernProjectForm = () => {
       setStep(step + 1);
     } else {
       handleSubmit();
+      setTimeout(() => {
+        router.push("/home");
+      }, 4000);
     }
   }
 
