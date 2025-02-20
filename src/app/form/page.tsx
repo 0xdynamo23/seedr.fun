@@ -1,6 +1,6 @@
 //@ts-nocheck
 "use client";
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useEffect } from "react";
 import { X, Plus, Send, Globe, Trash2 } from "lucide-react";
 import { SiDiscord } from "react-icons/si";
 import { FaXTwitter } from "react-icons/fa6";
@@ -39,6 +39,7 @@ const ProgressDot: React.FC<ProgressDotProps> = ({
 );
 
 const ModernProjectForm = () => {
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
   const router = useRouter();
   let counter = 0;
   const [links, setLinks] = useState([
@@ -347,13 +348,15 @@ const ModernProjectForm = () => {
                 )}
               </div>
             ))}
-            <button
-              type="button"
-              onClick={addTeamMember}
-              className="mt-4 px-4 py-2 text-base font-poppins text-emerald-500 rounded-lg"
-            >
-              + Add another members
-            </button>
+            {isWalletConnected && (
+              <button
+                type="button"
+                onClick={addTeamMember}
+                className="mt-4 px-4 py-2 text-base font-poppins text-emerald-500 rounded-lg"
+              >
+                Add Team Member
+              </button>
+            )}
           </div>
         );
 
@@ -592,6 +595,17 @@ const ModernProjectForm = () => {
       console.error("Submission error:", error);
     }
   };
+
+  useEffect(() => {
+    // Logic to check if the wallet is connected
+    const checkWalletConnection = async () => {
+      // Replace this with your actual wallet connection logic
+      const connected = await checkIfWalletIsConnected(); // This function should return true or false
+      setIsWalletConnected(connected);
+    };
+
+    checkWalletConnection();
+  }, []);
 
   return (
     <MaxWidthWrapper>

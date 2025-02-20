@@ -127,7 +127,8 @@ const HeroSection = () => {
               contribute through Seeder rounds to bring impactful ideas to life.
             </motion.p>
 
-            <Link href="/form">
+            
+            <Link href="/">
               <motion.button
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
