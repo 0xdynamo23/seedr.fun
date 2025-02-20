@@ -8,7 +8,7 @@ declare global {
 export async function POST(request: Request) {
   const { text, projectId } = await request.json();
   try {
-    const comment = await prisma.Comment.create({
+    const comment = await prisma.comment.create({
       data: {
         text,
         projectId,
@@ -24,8 +24,12 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const projectId = searchParams.get('projectId');
 
+  if (!projectId) {
+    return NextResponse.json({ error: 'Project ID is required' }, { status: 400 });
+  }
+
   try {
-    const comments = await prisma.Comment.findMany({
+    const comments = await prisma.comment.findMany({
       where: { projectId: projectId },
       orderBy: { timestamp: 'desc' },
     });
