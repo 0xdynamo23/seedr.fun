@@ -4,6 +4,8 @@ import React, { useState, FormEvent } from "react";
 import { X, Plus, Send, Globe, Trash2 } from "lucide-react";
 import { SiDiscord } from "react-icons/si";
 import { FaXTwitter } from "react-icons/fa6";
+import { useRouter } from "next/navigation";
+
 import { toast } from "react-hot-toast";
 import {
   ProgressDotProps,
@@ -37,6 +39,7 @@ const ProgressDot: React.FC<ProgressDotProps> = ({
 );
 
 const ModernProjectForm = () => {
+  const router = useRouter();
   let counter = 0;
   const [links, setLinks] = useState([
     { platform: "website", value: "", prompt: "https://" },
@@ -597,9 +600,10 @@ const ModernProjectForm = () => {
         >
           <button
             type="button"
-            className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors"
+            className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors duration-200 ease-in-out"
+            onClick={() => router.push("/")}
           >
-            <X size={20} />
+            <X size={20} className="w-5 h-5" />
           </button>
 
           <div className="p-4 sm:p-7">
