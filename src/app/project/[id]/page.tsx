@@ -391,9 +391,9 @@ const ProductPage = ({ params }: { params: { id: string } }) => {
                   </div>
 
                   {/* Reply Button */}
-                  <button className="px-3 py-1 text-sm bg-gray-100 rounded-full text-gray-600 hover:bg-gray-200 transition-colors">
+                  {/* <button className="px-3 py-1 text-sm bg-gray-100 rounded-full text-gray-600 hover:bg-gray-200 transition-colors">
                     Reply
-                  </button>
+                  </button> */}
                 </div>
               ))
             )}
