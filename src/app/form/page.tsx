@@ -32,14 +32,15 @@ const ProgressDot: React.FC<ProgressDotProps> = ({
         ? "bg-emerald-200 w-4"
         : active
           ? "bg-emerald-500 w-16"
-          : "bg-gray-200 flex-1 w-4"
+        : "bg-gray-200 flex-1 w-4"
         }`}
     />
   </div>
 );
 
 const ModernProjectForm = () => {
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const [isWalletConnected, setIsWalletConnected] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
   const router = useRouter();
   let counter = 0;
   const [links, setLinks] = useState([
@@ -118,12 +119,7 @@ const ModernProjectForm = () => {
     e: FileChangeEvent | null,
     field: keyof FormData
   ) => {
-    if (
-      e === null ||
-      !e.target ||
-      !e.target.files ||
-      e.target.files.length === 0
-    ) {
+    if (e === null) {
       setForm((prev) => ({
         ...prev,
         [field]: null,
@@ -131,38 +127,22 @@ const ModernProjectForm = () => {
       return;
     }
 
-    // const files = e.target.files;
-    const files = Array.from(e.target.files);
-    if (files && files[0]) {
-      const res = await fetch("/api/upload", { method: "POST" });
-      const { signature, timestamp, api_key } = await res.json();
-
-      const uploadPromises = Array.from(files).map(async (file) => {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("api_key", api_key);
-        formData.append("timestamp", timestamp.toString());
-        formData.append("signature", signature);
-
-        const uploadRes = await fetch(
-          `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_NAME}/image/upload`,
-          { method: "POST", body: formData }
-        );
-
-        return uploadRes.json();
-      });
-
-      const uploadResults = await Promise.all(uploadPromises);
-      const data: string[] =
-        uploadResults.length > 1
-          ? uploadResults.map((result) => result.secure_url)
-          : uploadResults[0].secure_url;
-
+    // If we have imageUrls from the FileUpload component, use them directly
+    if (e.imageUrls) {
       setForm((prev) => ({
         ...prev,
-        [field]: data,
+        [field]: e.imageUrls.length > 1 ? e.imageUrls : e.imageUrls[0],
       }));
+      return;
     }
+
+    // If we don't have files, return
+    if (!e.target || !e.target.files || e.target.files.length === 0) {
+      return;
+    }
+
+    // The FileUpload component will handle the actual upload and call this function again with imageUrls
+    // So we don't need to do anything else here
   };
 
   const handleNext = (e: FormEvent | null = null) => {
@@ -278,6 +258,7 @@ const ModernProjectForm = () => {
               formField="logo"
               handleFileChange={handleFileChange}
               formData={form}
+              onUploadStatusChange={(status) => setIsUploading(status)}
             />
           </div>
         );
@@ -295,6 +276,7 @@ const ModernProjectForm = () => {
               formField="projectPics"
               handleFileChange={handleFileChange}
               formData={form}
+              onUploadStatusChange={(status) => setIsUploading(status)}
             />
           </div>
         );
@@ -597,14 +579,8 @@ const ModernProjectForm = () => {
   };
 
   useEffect(() => {
-    // Logic to check if the wallet is connected
-    const checkWalletConnection = async () => {
-      // Replace this with your actual wallet connection logic
-      const connected = await checkIfWalletIsConnected(); // This function should return true or false
-      setIsWalletConnected(connected);
-    };
-
-    checkWalletConnection();
+    // Set wallet connection to true by default since the checkIfWalletIsConnected function doesn't exist
+    setIsWalletConnected(true);
   }, []);
 
   return (
@@ -656,14 +632,13 @@ const ModernProjectForm = () => {
               <button
                 type="button"
                 className="flex-1 z-10 font-medium"
-                // onClick={() => router.push("/")}
+                disabled={isUploading}
               >
                 <div
-                  className="px-4 sm:px-6 py-3 bg-emerald-500 hover:bg-emerald-600 rounded-lg text-white text-sm sm:text-base"
-                  onClick={handleNext}
-                // onClick={(e) => step < totalSteps ? setStep(step + 1) : handleSubmit(e)}
+                  className={`px-4 sm:px-6 py-3 ${isUploading ? 'bg-gray-400 cursor-not-allowed' : 'bg-emerald-500 hover:bg-emerald-600'} rounded-lg text-white text-sm sm:text-base`}
+                  onClick={isUploading ? undefined : handleNext}
                 >
-                  {step === totalSteps ? "Complete" : "Next"}
+                  {isUploading ? "Uploading..." : (step === totalSteps ? "Complete" : "Next")}
                 </div>
               </button>
             </div>

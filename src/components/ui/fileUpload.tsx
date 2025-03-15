@@ -9,7 +9,8 @@ const FileUpload: React.FC<FileUploadProps> = ({
   titleText, 
   multiple = false, 
   formField, 
-  formData 
+  formData,
+  onUploadStatusChange
 }) => {
     const [showPreview, setShowPreview] = useState(false);
     const [uploading, setUploading] = useState(false);
@@ -29,6 +30,13 @@ const FileUpload: React.FC<FileUploadProps> = ({
             setPreviewUrls([]);
         }
     }, [formData, formField]);
+
+    // Notify parent component when uploading state changes
+    useEffect(() => {
+        if (onUploadStatusChange) {
+            onUploadStatusChange(uploading);
+        }
+    }, [uploading, onUploadStatusChange]);
 
     const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files?.length) return;
@@ -66,7 +74,18 @@ const FileUpload: React.FC<FileUploadProps> = ({
             // Clean up local preview URLs
             localPreviewUrls.forEach(url => URL.revokeObjectURL(url));
             
-            handleFileChange({ ...e, imageUrls: uploadedUrls }, formField);
+            // Create a custom event with the uploaded URLs that matches the expected type
+            const customEvent = {
+                ...e,
+                imageUrls: uploadedUrls,
+                target: {
+                    ...e.target,
+                    files: null
+                }
+            } as React.ChangeEvent<HTMLInputElement> & { imageUrls: string[] };
+            
+            // Pass the custom event to the parent component
+            handleFileChange(customEvent, formField);
             setPreviewUrls(uploadedUrls);
         } catch (error) {
             console.error('Error uploading:', error);

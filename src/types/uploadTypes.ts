@@ -6,4 +6,5 @@ export interface FileUploadProps {
     formData: {
         [key: string]: string | string[] | null;
     };
+    onUploadStatusChange?: (isUploading: boolean) => void;
 }
