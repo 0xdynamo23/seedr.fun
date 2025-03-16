@@ -9,6 +9,13 @@ import Footer from "./navigation/footer";
 // providers
 import Providers from "./providers/providers";
 
+// Home components
+export { default as HeroSection } from './home/home';
+
+// UI components
+export { default as AnimatedBackground } from './ui/animated-background';
+export { default as AnimatedButton } from './ui/animated-button';
+
 export {
     Icons,
     MaxWidthWrapper,

@@ -8,7 +8,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata={
     title: "Seedr",
-    description: "Support builders you trust",
+    description: "Support builders You Trust",
 };
 
 export default function RootLayout({
@@ -21,7 +21,7 @@ export default function RootLayout({
         <html lang="en" className="scrollbar">
             <body
                 className={cn(
-                    "min-h-screen bg-white text-foreground overflow-x-hidden w-fit",
+                    "min-h-screen bg-white text-foreground overflow-x-hidden w-full",
                     aeonik.variable,
                     inter.variable,
                 )}
@@ -29,7 +29,7 @@ export default function RootLayout({
                 <Providers>
                     <Toaster richColors theme="dark" position="top-right" />
                     <HotToast />
-                    {typeof window !== 'undefined' && window.location.pathname !== '/form' && <Navbar />}
+                    <Navbar />
                     {children}
                     {typeof window !== 'undefined' && window.location.pathname !== '/form' && <Footer />}
                 </Providers>
