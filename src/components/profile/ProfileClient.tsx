@@ -2,25 +2,17 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useAbstraxionAccount } from "@burnt-labs/abstraxion";
 import Navbar from '../navigation/navbar';
+import Footer from '../navigation/footer';
 
 // Add a utility function for consistent date formatting
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
   return date.toLocaleDateString('en-US', {
     year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  });
-};
-
-const formatTime = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true
+    month: 'long',
+    day: 'numeric'
   });
 };
 
@@ -28,104 +20,215 @@ interface Project {
   id: string;
   name: string;
   tagline: string;
-  description: string;
-  category: string;
   logo: string;
-  ownerId: string;
+  raised: number;
+  contributors: number;
+}
+
+interface Contribution {
+  id: string;
+  projectId: string;
+  projectName: string;
+  projectLogo: string;
+  amount: number;
+  date: string;
+  time: string;
 }
 
 const ProfileClient = () => {
-    const [projects, setProjects] = useState<Project[]>([]);
-    const [loading, setLoading] = useState(true);
+  const { data: { bech32Address }, isConnected } = useAbstraxionAccount();
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [contributions, setContributions] = useState<Contribution[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                const userId = localStorage.getItem('userId');
-                const response = await axios.get('/api/getprojects');
-                console.log('All projects:', response.data);
-                
-                // Filter projects by ownerId
-                const userProjects = response.data.data.filter(
-                    (project: Project) => project.ownerId === userId
-                );
-                
-                console.log('User projects:', userProjects);
-                setProjects(userProjects);
-                setLoading(false);
-            } catch (error) {
-                console.error('Error fetching projects:', error);
-                setLoading(false);
-            }
-        };
+  // Format wallet address for display
+  const formatWalletAddress = (address: string | undefined) => {
+    if (!address) return '';
+    return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+  };
 
-        fetchProjects();
-    }, []);
+  useEffect(() => {
+    // Simulate loading data
+    setTimeout(() => {
+      // Dummy projects data
+      const dummyProjects = [
+        {
+          id: '1',
+          name: 'Cyronomics',
+          tagline: 'Platform to sell comics on chain',
+          logo: '/project-logos/cyronomics.png',
+          raised: 2456,
+          contributors: 5
+        },
+        {
+          id: '2',
+          name: 'Cyronomics',
+          tagline: 'Platform to sell comics on chain',
+          logo: '/project-logos/cyronomics.png',
+          raised: 2456,
+          contributors: 5
+        }
+      ];
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
+      // Dummy contributions data
+      const dummyContributions = [
+        {
+          id: '1',
+          projectId: '1',
+          projectName: 'Cyronomics',
+          projectLogo: '/plant.jpg',
+          amount: 150,
+          date: '21st February 2025',
+          time: '2:45 PM'
+        },
+        {
+          id: '2',
+          projectId: '1',
+          projectName: 'Cyronomics',
+          projectLogo: '/Xion.png',
+          amount: 127,
+          date: '21st February 2025',
+          time: '2:45 PM'
+        }
+      ];
 
+      setProjects(dummyProjects);
+      setContributions(dummyContributions);
+      setLoading(false);
+    }, 1000);
+  }, []);
+
+  if (loading) {
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex items-center gap-4 mb-8">
-                <div className="w-16 h-16 bg-gray-200 rounded-full overflow-hidden">
-                    <div className="w-full h-full bg-gray-300" />
-                </div>
-                <div>
-                    <h1 className="text-2xl font-bold text-black">Your Projects</h1>
-                    <p className="text-gray-600">Manage your listed projects</p>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {projects.length === 0 ? (
-                    <div className="col-span-full text-center py-10">
-                        <p className="text-gray-500">No projects found.</p>
-                    </div>
-                ) : (
-                    projects.map((project) => (
-                        <Link href={`/project/${project.id}`} key={project.id}>
-                            <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                                <div className="p-4">
-                                    <div className="flex items-center space-x-4">
-                                        <div className="w-12 h-12 rounded-lg overflow-hidden relative">
-                                            <Image
-                                                src={project.logo}
-                                                alt={project.name}
-                                                fill
-                                                className="object-cover"
-                                                sizes="(max-width: 48px) 100vw, 48px"
-                                            />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-lg font-semibold text-gray-900">
-                                                {project.name}
-                                            </h3>
-                                            <p className="text-sm text-gray-500">
-                                                {project.tagline}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="px-4 pb-4">
-                                    <p className="text-sm text-gray-600 line-clamp-2">
-                                        {project.description}
-                                    </p>
-                                    <div className="mt-4">
-                                        <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">
-                                            {project.category}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </Link>
-                    ))
-                )}
-            </div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+      </div>
     );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
+        {/* User Profile Header */}
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-12">
+          <div className="w-24 h-24 bg-emerald-100 rounded-full overflow-hidden flex items-center justify-center">
+            <span className="text-3xl font-bold text-emerald-600">
+              {bech32Address ? bech32Address.charAt(0).toUpperCase() : 'U'}
+            </span>
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">username4000</h1>
+            <p className="text-gray-600">username@gmail.com</p>
+          </div>
+        </div>
+
+        {/* Projects Listed Section */}
+        <div className="mb-16">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Projects listed</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {projects.map((project) => (
+              <div key={project.id} className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
+                <div className="p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-amber-100 rounded-lg overflow-hidden flex items-center justify-center">
+                      <Image 
+                        src={project.logo || '/project-logos/default.png'} 
+                        alt={project.name} 
+                        width={48} 
+                        height={48} 
+                        className="object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = '/project-logos/default.png';
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-gray-900">{project.name}</h3>
+                      <p className="text-sm text-gray-500">{project.tagline}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between mt-6">
+                    <div className="flex items-center gap-4">
+                      <div>
+                        <span className="text-sm text-gray-500">{project.contributors} Contributor</span>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-500">${project.raised} Raised</span>
+                      </div>
+                    </div>
+                    
+                    <Link href={`/project/${project.id}`} className="text-sm text-gray-500 hover:text-emerald-500 flex items-center gap-1">
+                      view project <span className="text-lg">→</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Believed In Section */}
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Believed in</h2>
+          
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            {/* Table Header */}
+            <div className="grid grid-cols-4 gap-4 p-4 border-b border-gray-100 bg-gray-50 text-sm text-gray-500 font-medium">
+              <div>PROJECT</div>
+              <div>AMOUNT CONTRIBUTED</div>
+              <div>CONTRIBUTED ON</div>
+              <div>TIME</div>
+            </div>
+            
+            {/* Table Content */}
+            {contributions.map((contribution) => (
+              <div key={contribution.id} className="grid grid-cols-4 gap-4 p-4 border-b border-gray-100 items-center">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-amber-100 rounded-lg overflow-hidden flex items-center justify-center">
+                    <Image 
+                      src={contribution.projectLogo || '/project-logos/default.png'} 
+                      alt={contribution.projectName} 
+                      width={40} 
+                      height={40} 
+                      className="object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = '/project-logos/default.png';
+                      }}
+                    />
+                  </div>
+                  <span className="font-medium">{contribution.projectName}</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="flex items-center gap-2">
+            
+                    <span className='text-md text-black'>{contribution.amount} XION</span>
+                  </div>
+                </div>
+                <div className='text-sm text-black'>{contribution.date}</div>
+                <div className="flex items-center justify-between">
+                  <span className='text-sm text-black'>{contribution.time}</span>
+                  <button className="text-gray-400 hover:text-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                      <circle cx="12" cy="12" r="1"></circle>
+                      <circle cx="19" cy="12" r="1"></circle>
+                      <circle cx="5" cy="12" r="1"></circle>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <Footer />
+    </div>
+  );
 };
 
 export default ProfileClient; 

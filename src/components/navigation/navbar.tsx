@@ -47,6 +47,12 @@ const Navbar = () => {
     }
   };
 
+  // Format wallet address for display
+  const formatWalletAddress = (address: string | undefined) => {
+    if (!address) return '';
+    return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+  };
+
   return (
     <header 
       className={`fixed top-0 inset-x-0 w-full z-50 transition-all duration-300 ${
@@ -71,15 +77,33 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* Connect/Disconnect Button */}
-          <button
-            className="bg-black text-white px-4 py-2 rounded-lg font-medium text-sm transition-all hover:bg-gray-800"
-            onClick={handleWalletAction}
-            disabled={isConnecting}
-            style={{ minWidth: "150px" }}
-          >
-            {isConnecting ? 'Connecting...' : isConnected ? "Disconnect" : "Connect Wallet"}
-          </button>
+          <div className="flex items-center gap-4">
+            {/* Wallet Address - Only show when connected */}
+            {isConnected && bech32Address && (
+              <Link 
+                href="/profile" 
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 border border-gray-200 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md"
+              >
+                <div className="w-7 h-7 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center shadow-inner">
+                  <span className="text-xs font-bold text-white">
+                    {bech32Address.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <span className="text-sm font-medium text-gray-800">
+                  {formatWalletAddress(bech32Address)}
+                </span>
+              </Link>
+            )}
+
+            {/* Connect/Disconnect Button */}
+            <button
+              className="bg-gradient-to-r from-gray-800 to-black text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-all duration-300 hover:shadow-lg hover:from-black hover:to-gray-800 border border-gray-700"
+              onClick={handleWalletAction}
+              disabled={isConnecting}
+            >
+              {isConnecting ? 'Connecting...' : isConnected ? "Disconnect" : "Connect Wallet"}
+            </button>
+          </div>
         </div>
       </div>
     </header>

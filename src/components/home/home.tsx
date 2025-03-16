@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, Sparkles, Star, Heart, Zap } from 'lucide-re
 import Footer from "../navigation/footer";
 import Navbar from "../navigation/navbar";
 import confetti from 'canvas-confetti';
+import { useAbstraxionAccount, useModal } from "@burnt-labs/abstraxion";
 
 type Project = {
   id: string;
@@ -406,6 +407,8 @@ const HeroSection = () => {
   const heroRef = useRef(null);
   const isHeroInView = useInView(heroRef, { once: true });
   const { scrollY } = useScroll();
+  const { isConnected } = useAbstraxionAccount();
+  const [, setShow] = useModal();
   
   // Parallax effect for background
   const bgY = useTransform(scrollY, [0, 500], [0, -50]);
@@ -574,12 +577,18 @@ const HeroSection = () => {
                 }}
                 whileTap={{ scale: 0.95 }}
                 className="bg-green-500 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 relative overflow-hidden group"
+                onClick={(e) => {
+                  if (!isConnected) {
+                    e.preventDefault();
+                    setShow(true);
+                  }
+                }}
               >
                 <motion.span 
                   className="absolute inset-0 bg-gradient-to-r from-green-600 to-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                 />
                 <motion.span className="relative z-10 flex items-center gap-2">
-                  Start posting
+                  {isConnected ? "Start posting" : "Connect wallet"}
                   <motion.svg
                     className="w-4 h-4"
                     viewBox="0 0 24 24"
