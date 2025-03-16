@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useAbstraxionAccount } from "@burnt-labs/abstraxion";
 import Navbar from '../navigation/navbar';
 import Footer from '../navigation/footer';
+import { Pencil } from 'lucide-react';
 
 // Add a utility function for consistent date formatting
 const formatDate = (dateString: string) => {
@@ -21,8 +22,7 @@ interface Project {
   name: string;
   tagline: string;
   logo: string;
-  raised: number;
-  contributors: number;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
 }
 
 interface Contribution {
@@ -40,11 +40,34 @@ const ProfileClient = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [contributions, setContributions] = useState<Contribution[]>([]);
   const [loading, setLoading] = useState(true);
+  const [username, setUsername] = useState('username4000');
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [tempUsername, setTempUsername] = useState('');
 
   // Format wallet address for display
   const formatWalletAddress = (address: string | undefined) => {
     if (!address) return '';
     return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+  };
+
+  const handleUsernameEdit = () => {
+    setTempUsername(username);
+    setIsEditingUsername(true);
+  };
+
+  const handleUsernameSave = () => {
+    if (tempUsername.trim()) {
+      setUsername(tempUsername);
+    }
+    setIsEditingUsername(false);
+  };
+
+  const handleUsernameKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleUsernameSave();
+    } else if (e.key === 'Escape') {
+      setIsEditingUsername(false);
+    }
   };
 
   useEffect(() => {
@@ -57,16 +80,21 @@ const ProfileClient = () => {
           name: 'Cyronomics',
           tagline: 'Platform to sell comics on chain',
           logo: '/project-logos/cyronomics.png',
-          raised: 2456,
-          contributors: 5
+          status: 'PENDING' as const
         },
         {
           id: '2',
           name: 'Cyronomics',
           tagline: 'Platform to sell comics on chain',
           logo: '/project-logos/cyronomics.png',
-          raised: 2456,
-          contributors: 5
+          status: 'ACCEPTED' as const
+        },
+        {
+          id: '3',
+          name: 'Cyronomics',
+          tagline: 'Platform to sell comics on chain',
+          logo: '/project-logos/cyronomics.png',
+          status: 'REJECTED' as const
         }
       ];
 
@@ -119,7 +147,34 @@ const ProfileClient = () => {
             </span>
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">username4000</h1>
+            <div className="flex items-center gap-2">
+              {isEditingUsername ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={tempUsername}
+                    onChange={(e) => setTempUsername(e.target.value)}
+                    onKeyDown={handleUsernameKeyDown}
+                    onBlur={handleUsernameSave}
+                    autoFocus
+                    className="text-3xl font-bold text-gray-900 bg-transparent border-b-2 border-emerald-500 focus:outline-none"
+                  />
+                  <span className="text-sm text-gray-500">
+                    Press Enter to save, Esc to cancel
+                  </span>
+                </div>
+              ) : (
+                <>
+                  <h1 className="text-3xl font-bold text-gray-900">{username}</h1>
+                  <button 
+                    onClick={handleUsernameEdit}
+                    className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    <Pencil className="w-4 h-4 text-gray-500" />
+                  </button>
+                </>
+              )}
+            </div>
             <p className="text-gray-600">username@gmail.com</p>
           </div>
         </div>
@@ -152,13 +207,16 @@ const ProfileClient = () => {
                   </div>
                   
                   <div className="flex items-center justify-between mt-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                      <div>
-                        <span className="text-sm text-gray-500">{project.contributors} Contributor</span>
-                      </div>
-                      <div>
-                        <span className="text-sm text-gray-500">${project.raised} Raised</span>
-                      </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-sm px-2 py-1 rounded ${
+                        project.status === 'ACCEPTED' 
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : project.status === 'REJECTED'
+                          ? 'bg-red-100 text-red-800'
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {project.status === 'PENDING' ? 'Verification Pending' : project.status}
+                      </span>
                     </div>
                     
                     <Link href={`/project/${project.id}`} className="text-sm text-gray-500 hover:text-emerald-500 flex items-center gap-1">
