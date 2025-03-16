@@ -624,7 +624,7 @@ const HeroSection = () => {
 
             {/* Category Filters */}
             <motion.div 
-              className="flex gap-3 mb-6 overflow-x-auto scrollbar-hide pb-2 max-w-7xl mx-auto px-2 md:px-4 lg:px-8"
+              className="flex flex-wrap gap-3 mb-6 max-w-7xl mx-auto px-2 md:px-4 lg:px-8"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 1.2 }}

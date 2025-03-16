@@ -152,7 +152,7 @@ const ProfileClient = () => {
                   </div>
                   
                   <div className="flex items-center justify-between mt-6">
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                       <div>
                         <span className="text-sm text-gray-500">{project.contributors} Contributor</span>
                       </div>
@@ -176,8 +176,8 @@ const ProfileClient = () => {
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Believed in</h2>
           
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            {/* Table Header */}
-            <div className="grid grid-cols-4 gap-4 p-4 border-b border-gray-100 bg-gray-50 text-sm text-gray-500 font-medium">
+            {/* Table Header - Hide on mobile */}
+            <div className="hidden sm:grid grid-cols-4 gap-4 p-4 border-b border-gray-100 bg-gray-50 text-sm text-gray-500 font-medium">
               <div>PROJECT</div>
               <div>AMOUNT CONTRIBUTED</div>
               <div>CONTRIBUTED ON</div>
@@ -186,7 +186,7 @@ const ProfileClient = () => {
             
             {/* Table Content */}
             {contributions.map((contribution) => (
-              <div key={contribution.id} className="grid grid-cols-4 gap-4 p-4 border-b border-gray-100 items-center">
+              <div key={contribution.id} className="grid grid-cols-1 sm:grid-cols-4 gap-4 p-4 border-b border-gray-100 items-center">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-amber-100 rounded-lg overflow-hidden flex items-center justify-center">
                     <Image 
@@ -203,15 +203,40 @@ const ProfileClient = () => {
                   </div>
                   <span className="font-medium">{contribution.projectName}</span>
                 </div>
-                <div className="flex items-center">
+                
+                {/* Mobile labels */}
+                <div className="sm:hidden mt-3 grid grid-cols-2 gap-2">
+                  <div className="text-xs text-gray-500">AMOUNT:</div>
+                  <div className="text-xs text-gray-500">DATE:</div>
+                  <div className="flex items-center">
+                    <span className='text-md text-black'>{contribution.amount} XION</span>
+                  </div>
+                  <div className='text-sm text-black'>{contribution.date}</div>
+                  <div className="text-xs text-gray-500">TIME:</div>
+                  <div></div>
+                  <div className='text-sm text-black'>{contribution.time}</div>
+                </div>
+                
+                {/* Desktop view */}
+                <div className="hidden sm:flex items-center">
                   <div className="flex items-center gap-2">
-            
                     <span className='text-md text-black'>{contribution.amount} XION</span>
                   </div>
                 </div>
-                <div className='text-sm text-black'>{contribution.date}</div>
-                <div className="flex items-center justify-between">
+                <div className='hidden sm:block text-sm text-black'>{contribution.date}</div>
+                <div className="hidden sm:flex items-center justify-between">
                   <span className='text-sm text-black'>{contribution.time}</span>
+                  <button className="text-gray-400 hover:text-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                      <circle cx="12" cy="12" r="1"></circle>
+                      <circle cx="19" cy="12" r="1"></circle>
+                      <circle cx="5" cy="12" r="1"></circle>
+                    </svg>
+                  </button>
+                </div>
+                
+                {/* Mobile action button */}
+                <div className="sm:hidden flex justify-end mt-2">
                   <button className="text-gray-400 hover:text-gray-600">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
                       <circle cx="12" cy="12" r="1"></circle>
