@@ -46,7 +46,7 @@ const Step2Category: React.FC<Step2Props> = ({ category, onChange }) => {
               htmlFor={`category-${cat.id}`}
               className={`
                 flex flex-col items-center justify-center p-4 rounded-lg border-2 cursor-pointer
-                transition-all duration-200 h-full
+                transition-all duration-200 h-full relative
                 ${category === cat.id 
                   ? 'border-emerald-500 bg-emerald-50 text-emerald-800' 
                   : 'border-gray-200 hover:border-emerald-200 hover:bg-gray-50 text-gray-800'
@@ -59,9 +59,10 @@ const Step2Category: React.FC<Step2Props> = ({ category, onChange }) => {
               {category === cat.id && (
                 <motion.div 
                   className="absolute top-2 right-2 bg-emerald-500 text-white rounded-full p-1 shadow-sm"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', damping: 10 }}
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0 }}
+                  transition={{ duration: 0.2 }}
                 >
                   <Check size={14} />
                 </motion.div>

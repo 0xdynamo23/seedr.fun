@@ -90,7 +90,7 @@ const Navbar = () => {
                   </span>
                 </div>
                 <span className="text-sm font-medium text-gray-800">
-                  {formatWalletAddress(bech32Address)}
+                  Profile Page
                 </span>
               </Link>
             )}
