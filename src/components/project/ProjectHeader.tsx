@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import Image from "next/image";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "framer-motion";
 import { FaDollarSign } from "react-icons/fa";
 
 type Project = {
@@ -32,20 +32,36 @@ interface ProjectHeaderProps {
 const ProjectHeader = ({ project }: ProjectHeaderProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   
-  const y = useTransform(scrollY, [0, 300], [0, 150]);
-  const opacity = useTransform(scrollY, [0, 200], [1, 0]);
-  const scale = useTransform(scrollY, [0, 200], [1, 1.1]);
+  // Parallax effect for banner
+  const y = useTransform(scrollY, [0, 500], [0, 100]);
+  const bgY = useTransform(scrollY, [0, 500], [0, -50]);
+  const scale = useTransform(scrollY, [0, 500], [1, 1.2]);
   
-  const springY = useSpring(y, { stiffness: 100, damping: 30 });
-  const springOpacity = useSpring(opacity, { stiffness: 100, damping: 30 });
+  // Smoother animation
+  const springBgY = useSpring(bgY, { stiffness: 100, damping: 30 });
   const springScale = useSpring(scale, { stiffness: 100, damping: 30 });
   
-  const bgY = useTransform(scrollY, [0, 300], [0, 100]);
-  const springBgY = useSpring(bgY, { stiffness: 100, damping: 30 });
+  // Auto carousel effect for multiple banners
+  useEffect(() => {
+    if (!project.projectPics || project.projectPics.length <= 1) return;
+    
+    const interval = setInterval(() => {
+      setCurrentBannerIndex(prev => (prev + 1) % project.projectPics!.length);
+    }, 6000); // Change banner every 6 seconds
+    
+    return () => clearInterval(interval);
+  }, [project.projectPics]);
   
-  const rotate = useTransform(scrollY, [0, 200], [0, -5]);
-  const springRotate = useSpring(rotate, { stiffness: 100, damping: 30 });
+  // Choose banner URL
+  const getBannerUrl = () => {
+    if (!project.projectPics || project.projectPics.length === 0) {
+      return null;
+    }
+    
+    return project.projectPics[currentBannerIndex];
+  };
 
   return (
     <div 
@@ -60,13 +76,40 @@ const ProjectHeader = ({ project }: ProjectHeaderProps) => {
         }}
       >
         {project.projectPics && project.projectPics.length > 0 ? (
-          <Image
-            src={project.projectPics[0]}
-            alt={project.name}
-            fill
-            className="object-cover opacity-70 w-full"
-            priority
-          />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentBannerIndex}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1 }}
+              className="absolute inset-0"
+            >
+              <Image
+                src={getBannerUrl() || ""}
+                alt={project.name}
+                fill
+                className="object-cover opacity-70 w-full"
+                priority
+              />
+              
+              {/* Progressive indicator for multiple banners */}
+              {project.projectPics.length > 1 && (
+                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
+                  {project.projectPics.map((_, index) => (
+                    <div 
+                      key={index}
+                      className={`h-1.5 rounded-full transition-all duration-300 ${
+                        index === currentBannerIndex 
+                          ? "w-8 bg-white" 
+                          : "w-2 bg-white/50"
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
         ) : (
           <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-blue-500/20 backdrop-blur-xl"></div>
         )}
@@ -94,166 +137,42 @@ const ProjectHeader = ({ project }: ProjectHeaderProps) => {
             repeatType: "reverse" 
           }}
         />
-        
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {Array.from({ length: 20 }).map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 rounded-full bg-white/40"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{ 
-                y: [0, -15, 0],
-                opacity: [0.2, 0.5, 0.2],
-                scale: [1, 1.5, 1],
-              }}
-              transition={{ 
-                duration: 3 + Math.random() * 5,
-                repeat: Infinity,
-                repeatType: "reverse",
-                delay: Math.random() * 5
-              }}
-            />
-          ))}
-        </div>
       </motion.div>
       
-      <div className="relative z-20 w-full px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-end pb-12">
-        <motion.div 
-          className="flex items-center space-x-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          style={{ opacity: springOpacity }}
-        >
-          <motion.div 
-            className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-4 border-white shadow-xl"
-            style={{ rotate: springRotate }}
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Image
-              src={project.logo}
+      <div className="absolute bottom-0 left-0 w-full px-4 sm:px-6 lg:px-8 pb-8 pt-24 bg-gradient-to-t from-white via-white/95 to-transparent z-20">
+        <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
+          {/* Project Logo */}
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-white shadow-lg border border-gray-200">
+            <Image 
+              src={project.logo || "https://via.placeholder.com/80"} 
               alt={project.name}
-              fill
-              className="object-contain bg-white"
+              width={80}
+              height={80}
+              className="w-full h-full object-cover"
             />
-            
-            <motion.div 
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-              initial={{ x: '-100%' }}
-              animate={{ x: '200%' }}
-              transition={{ 
-                duration: 1.5, 
-                repeat: Infinity,
-                repeatDelay: 3
-              }}
-            />
-          </motion.div>
-          
-          <div>
-            <motion.h1 
-              className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              style={{
-                textShadow: "0 1px 2px rgba(255, 255, 255, 0.5)"
-              }}
-            >
-              {project.name}
-            </motion.h1>
-            <motion.p 
-              className="text-lg sm:text-xl text-gray-700 mt-1 font-medium"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              {project.tagline}
-            </motion.p>
           </div>
-        </motion.div>
-        
-        <motion.div 
-          className="flex flex-wrap items-center gap-4 mt-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-        >
-          <motion.div 
-            className="flex items-center space-x-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm"
-            whileHover={{ 
-              y: -2, 
-              boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-              backgroundColor: "rgba(255, 255, 255, 0.9)"
-            }}
-          >
-            <motion.div 
-              className="w-2 h-2 bg-green-500 rounded-full"
-              animate={{ 
-                scale: [1, 1.5, 1],
-                opacity: [0.7, 1, 0.7]
-              }}
-              transition={{ 
-                duration: 2, 
-                repeat: Infinity,
-                repeatType: "reverse" 
-              }}
-            />
-            <span className="text-gray-700">
-              <span className="font-semibold">{project.contributors || 1}</span> Contributor{(project.contributors || 1) !== 1 ? 's' : ''}
-            </span>
-          </motion.div>
           
-          <motion.div 
-            className="flex items-center space-x-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm"
-            whileHover={{ 
-              y: -2, 
-              boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-              backgroundColor: "rgba(255, 255, 255, 0.9)"
-            }}
-          >
-            <motion.div
-              animate={{ 
-                rotate: [0, 10, 0, -10, 0],
-                scale: [1, 1.1, 1, 1.1, 1]
-              }}
-              transition={{ 
-                duration: 5, 
-                repeat: Infinity,
-                repeatType: "reverse",
-                repeatDelay: 2
-              }}
-            >
-              <FaDollarSign className="text-green-500" />
-            </motion.div>
-            <span className="text-gray-700">
-              <motion.span 
-                className="font-semibold"
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.6 }}
-              >
-                ${project.raised || 0}
-              </motion.span> Raised
-            </span>
-          </motion.div>
+          {/* Project Title & Tagline */}
+          <div className="flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{project.name}</h1>
+            <p className="text-gray-700 max-w-3xl">{project.tagline}</p>
+          </div>
           
-          <motion.div 
-            className="flex items-center space-x-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm"
-            whileHover={{ 
-              y: -2, 
-              boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-              backgroundColor: "rgba(255, 255, 255, 0.9)"
-            }}
-          >
-            <span className="text-gray-700 font-medium">
-              {project.category}
-            </span>
-          </motion.div>
-        </motion.div>
+          {/* Project Stats */}
+          <div className="flex flex-col items-end gap-2 hidden sm:flex">
+            <div className="flex items-center gap-2 bg-emerald-100 px-4 py-2 rounded-full">
+              <div className="p-1 bg-emerald-500 rounded-full">
+                <FaDollarSign className="w-4 h-4 text-white" />
+              </div>
+              <span className="font-semibold text-emerald-700">
+                {project.raised || 0} <span className="font-normal">XION raised</span>
+              </span>
+            </div>
+            <div className="text-sm text-gray-500">
+              {project.contributors || 0} believers
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

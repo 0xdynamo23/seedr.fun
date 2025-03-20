@@ -1,21 +1,29 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
 
-export async function GET() {
+const prisma = new PrismaClient();
+
+// GET /api/projects?ownerId={bech32Address} - Fetch projects by owner ID
+export async function GET(req: NextRequest) {
   try {
+    const { searchParams } = new URL(req.url);
+    const ownerId = searchParams.get("ownerId");
+
+    if (!ownerId) {
+      return NextResponse.json({ error: "Owner ID is required" }, { status: 400 });
+    }
+
     const projects = await prisma.project.findMany({
-      include: {
-        owner: true,
-        links: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
+      where: { ownerId },
+      orderBy: { createdAt: 'desc' }
     });
 
-    return NextResponse.json(projects);
+    return NextResponse.json({ projects });
   } catch (error) {
     console.error("Error fetching projects:", error);
-    return NextResponse.json({ error: "Failed to fetch projects" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch projects" },
+      { status: 500 }
+    );
   }
 }

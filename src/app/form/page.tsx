@@ -4,6 +4,7 @@ import React, { useState, FormEvent, useEffect } from "react";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import { useAbstraxionAccount } from "@burnt-labs/abstraxion";
 
 // Types
 import {
@@ -27,11 +28,15 @@ import Step4Pictures from "./components/steps/Step4Pictures";
 import Step5Team from "./components/steps/Step5Team";
 import Step6Links from "./components/steps/Step6Links";
 import Step7Description from "./components/steps/Step7Description";
+import ProfileCreationStep from "./components/steps/ProfileCreationStep";
 
 const ModernProjectForm = () => {
+  const { data: { bech32Address } } = useAbstraxionAccount();
   const [isWalletConnected, setIsWalletConnected] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [userExists, setUserExists] = useState(false);
+  const [isCheckingUser, setIsCheckingUser] = useState(true);
   const router = useRouter();
   
   const [links, setLinks] = useState([
@@ -42,7 +47,7 @@ const ModernProjectForm = () => {
     return setLinks([...links, link]);
   };
 
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [form, setForm] = useState({
     name: "",
     tagline: "",
@@ -58,9 +63,34 @@ const ModernProjectForm = () => {
       website: "",
     },
     description: "",
+    username: "",
+    email: "",
   });
 
-  const totalSteps = 7;
+  const totalSteps = 8;
+
+  useEffect(() => {
+    const checkUserExists = async () => {
+      if (!bech32Address) return;
+
+      try {
+        const response = await fetch(`/api/user?id=${bech32Address}`);
+        const data = await response.json();
+        
+        setUserExists(data.exists);
+        setIsCheckingUser(false);
+
+        if (data.exists) {
+          setStep(1);
+        }
+      } catch (error) {
+        console.error("Error checking user:", error);
+        setIsCheckingUser(false);
+      }
+    };
+
+    checkUserExists();
+  }, [bech32Address]);
 
   const handleChange = (e: FormChangeEvent) => {
     const { name, value } = e.target;
@@ -97,7 +127,6 @@ const ModernProjectForm = () => {
       return;
     }
 
-    // If we have imageUrls from the FileUpload component, use them directly
     if (e.imageUrls) {
       setForm((prev) => ({
         ...prev,
@@ -106,28 +135,63 @@ const ModernProjectForm = () => {
       return;
     }
 
-    // If we don't have files, return
     if (!e.target || !e.target.files || e.target.files.length === 0) {
       return;
     }
-
-    // The FileUpload component will handle the actual upload and call this function again with imageUrls
-    // So we don't need to do anything else here
   };
 
   const handleNext = (e: FormEvent | null = null) => {
     if (e) e.preventDefault();
     if (!validateStep()) {
       toast.error("Please fill all required fields.");
-    } else if (step < totalSteps) {
-      setStep(step + 1);
+    } else if (step < totalSteps - 1) {
+      if (step === 0) {
+        createUser();
+      } else {
+        setStep(step + 1);
+      }
     } else {
       handleSubmit();
     }
   }
 
+  const createUser = async () => {
+    if (!bech32Address) {
+      toast.error("Wallet not connected");
+      return;
+    }
+
+    try {
+      const userData = {
+        id: bech32Address,
+        name: form.username,
+        email: form.email
+      };
+
+      const response = await fetch("/api/user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setUserExists(true);
+        setStep(1);
+      } else {
+        toast.error("Error creating profile: " + data.error);
+      }
+    } catch (error) {
+      console.error("Error creating user:", error);
+      toast.error("Something went wrong. Please try again.");
+    }
+  };
+
   const validateStep = () => {
     switch (step) {
+      case 0:
+        return form.username && form.email;
       case 1:
         return form.name && form.tagline;
       case 2:
@@ -163,6 +227,8 @@ const ModernProjectForm = () => {
 
   const getStepTitle = () => {
     switch (step) {
+      case 0:
+        return "Create your profile";
       case 1:
         return "Hey 👋";
       case 2:
@@ -184,6 +250,8 @@ const ModernProjectForm = () => {
 
   const getStepSubtitle = () => {
     switch (step) {
+      case 0:
+        return "Before you create a project, let's set up your profile with a username and email.";
       case 1:
         return "Let's begin crafting your project! Share some details with us - we'll need a name and a tagline that perfectly represents your vision.";
       case 2:
@@ -205,6 +273,14 @@ const ModernProjectForm = () => {
 
   const renderStep = () => {
     switch (step) {
+      case 0:
+        return (
+          <ProfileCreationStep 
+            username={form.username}
+            email={form.email}
+            onChange={handleChange}
+          />
+        );
       case 1:
         return (
           <Step1BasicInfo 
@@ -284,7 +360,7 @@ const ModernProjectForm = () => {
     const formData = {
       ...form,
       projectPics: projectPicsArray,
-      ownerId: localStorage.getItem("xion-authz-granter-account") || null,
+      ownerId: bech32Address || localStorage.getItem("xion-authz-granter-account") || null,
     };
 
     try {
@@ -316,7 +392,6 @@ const ModernProjectForm = () => {
   };
 
   useEffect(() => {
-    // Set wallet connection to true by default since the checkIfWalletIsConnected function doesn't exist
     setIsWalletConnected(true);
   }, []);
 

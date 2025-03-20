@@ -7,4 +7,5 @@ export interface FileUploadProps {
         [key: string]: string | string[] | null;
     };
     onUploadStatusChange?: (isUploading: boolean) => void;
+    maxFiles?: number;
 }
