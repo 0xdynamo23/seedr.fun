@@ -102,7 +102,7 @@ const Navbar = () => {
                 className="flex sm:hidden items-center justify-center w-9 h-9 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full shadow-sm hover:shadow-md transition-all duration-300"
               >
                 <span className="text-xs font-bold text-white">
-                  {bech32Address.charAt(0).toUpperCase()}
+                  Profile Page
                 </span>
               </Link>
             )}
