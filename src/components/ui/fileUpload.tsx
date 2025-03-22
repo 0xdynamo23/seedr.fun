@@ -376,7 +376,9 @@ const FileUpload: React.FC<FileUploadProps> = ({
                                         className="absolute top-2 left-2 bg-black/70 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            setImageToResize(url);
+                                            // Create a new URL with cache busting parameter to avoid CORS issues on recropping
+                                            const cacheBustUrl = `${url}${url.includes('?') ? '&' : '?'}cacheBust=${Date.now()}`;
+                                            setImageToResize(cacheBustUrl);
                                             setShowResizer(true);
                                         }}
                                         type="button"
@@ -407,8 +409,13 @@ const FileUpload: React.FC<FileUploadProps> = ({
                         {!multiple && (
                             <button
                                 className="text-sm text-blue-500 hover:text-blue-600"
-                                onClick={() => !uploading && inputRef.current?.click()}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    !uploading && inputRef.current?.click();
+                                }}
                                 disabled={uploading}
+                                type="button"
                             >
                                 {uploading ? 'Uploading...' : 'Change image'}
                             </button>

@@ -31,6 +31,7 @@ type Project = {
   }[];
   timestamp: string;
   createdAt: string;
+  status?: "PENDING" | "ACCEPTED" | "REJECTED";
 };
 
 interface Comment {
@@ -137,6 +138,12 @@ const ProductPage = ({ params }: { params: { id: string } }) => {
     if (!isConnected) {
       toast.error("Please connect your wallet to comment");
       return Promise.reject("Wallet not connected");
+    }
+    
+    // Check if project is approved before allowing comments
+    if (project?.status !== "ACCEPTED") {
+      toast.error("Comments are only enabled for approved projects");
+      return Promise.reject("Project not approved");
     }
 
     const commentData = {
@@ -347,6 +354,7 @@ const ProductPage = ({ params }: { params: { id: string } }) => {
           onAddComment={handleAddComment}
           onToggleLike={handleToggleLike}
           currentUserId={bech32Address || ""}
+          isCommentsEnabled={project.status === "ACCEPTED"}
         />
       </div>
       

@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Info } from 'lucide-react';
 
 interface Step7Props {
   description: string;
@@ -9,7 +10,7 @@ interface Step7Props {
 const Step7Description: React.FC<Step7Props> = ({ description, onChange }) => {
   return (
     <motion.div 
-      className="space-y-4 h-[300px]"
+      className="space-y-4 h-[420px]"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
@@ -41,12 +42,22 @@ const Step7Description: React.FC<Step7Props> = ({ description, onChange }) => {
         />
         
         <motion.div 
-          className="absolute mt-[10px] left-0 w-full text-center text-sm text-gray-500"
+          className="space-y-4 mt-4 text-sm text-gray-700"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          Be detailed and specific about what makes your project unique
+          <div className="font-medium flex items-center gap-2 text-emerald-600">
+            <Info size={16} className="text-emerald-500" /> Include the following in your description:
+          </div>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>What problem does your project solve?</li>
+            <li>What makes your project unique compared to existing solutions?</li>
+            <li>Who is your target audience?</li>
+            <li>What is your business model or monetization plan?</li>
+            <li>What is your project roadmap and timeline?</li>
+            <li>Any traction or milestones achieved so far?</li>
+          </ul>
         </motion.div>
       </motion.div>
     </motion.div>

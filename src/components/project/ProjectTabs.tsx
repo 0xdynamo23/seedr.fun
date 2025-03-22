@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, MessageSquare } from "lucide-react";
 import AboutTab from "./tabs/AboutTab";
 import CommentsTab from "./tabs/CommentsTab";
 import SocialsTab from "./tabs/SocialsTab";
@@ -44,9 +44,10 @@ interface ProjectTabsProps {
   onAddComment: (text: string, parentId?: number) => void;
   onToggleLike: (commentId: number) => void;
   currentUserId: string;
+  isCommentsEnabled?: boolean;
 }
 
-const ProjectTabs = ({ project, comments, onAddComment, onToggleLike, currentUserId }: ProjectTabsProps) => {
+const ProjectTabs = ({ project, comments, onAddComment, onToggleLike, currentUserId, isCommentsEnabled = true }: ProjectTabsProps) => {
   const [activeTab, setActiveTab] = useState("about");
   const [showFullDescription, setShowFullDescription] = useState(false);
 
@@ -181,12 +182,27 @@ const ProjectTabs = ({ project, comments, onAddComment, onToggleLike, currentUse
             exit="exit"
             className="w-full"
           >
-            <CommentsTab 
-              comments={comments} 
-              onAddComment={onAddComment} 
-              onToggleLike={onToggleLike}
-              currentUserId={currentUserId}
-            />
+            {isCommentsEnabled ? (
+              <CommentsTab 
+                comments={comments} 
+                onAddComment={onAddComment} 
+                onToggleLike={onToggleLike}
+                currentUserId={currentUserId}
+              />
+            ) : (
+              <motion.div
+                className="p-8 text-center bg-gray-50 rounded-lg"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <div className="text-gray-500 mb-2">
+                  <MessageSquare className="h-12 w-12 mx-auto mb-3 text-gray-400" />
+                  <h3 className="text-lg font-medium">Comments are disabled</h3>
+                  <p>Comments will be enabled once this project is approved by admins.</p>
+                </div>
+              </motion.div>
+            )}
           </motion.div>
         )}
         

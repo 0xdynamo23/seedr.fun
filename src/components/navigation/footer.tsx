@@ -106,7 +106,7 @@ const Footer = () => {
                 variants={itemVariants}
               >
                 <motion.div whileHover="hover">
-                  <Link href="https://x.com/Seedrfun" className="text-gray-500 hover:text-gray-700 transition-colors p-2 block">
+                  <Link href="https://x.com/Seedrfun" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-700 transition-colors p-2 block">
                     <motion.svg 
                       className="w-5 h-5" 
                       viewBox="0 0 24 24" 
@@ -114,21 +114,6 @@ const Footer = () => {
                       variants={socialIconVariants}
                     >
                       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                    </motion.svg>
-                  </Link>
-                </motion.div>
-                <motion.div whileHover="hover">
-                  <Link href="https://telegram.org" className="text-gray-500 hover:text-gray-700 transition-colors p-2 block">
-                    <motion.svg 
-                      className="w-5 h-5" 
-                      viewBox="0 0 24 24" 
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      variants={socialIconVariants}
-                    >
-                      <path d="M22 2L11 13" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M22 2L15 22L11 13L2 9L22 2Z" strokeLinecap="round" strokeLinejoin="round"/>
                     </motion.svg>
                   </Link>
                 </motion.div>
@@ -143,7 +128,7 @@ const Footer = () => {
               <motion.div className="space-y-2" variants={itemVariants}>
                 <h3 className="text-sm text-gray-400 uppercase">Contact us</h3>
                 <motion.a 
-                  href="mailto:admin@seeder.com" 
+                  href="mailto:seedr@cyrostudios.com" 
                   className="text-gray-600 hover:text-gray-900 font-bold transition-colors inline-flex items-center gap-1 group"
                   whileHover={{ scale: 1.05 }}
                 >
