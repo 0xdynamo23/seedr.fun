@@ -128,10 +128,18 @@ const ModernProjectForm = () => {
     }
 
     if (e.imageUrls) {
-      setForm((prev) => ({
-        ...prev,
-        [field]: e.imageUrls.length > 1 ? e.imageUrls : e.imageUrls[0],
-      }));
+      if (field === 'projectPics') {
+        console.log('Setting projectPics:', e.imageUrls);
+        setForm((prev) => ({
+          ...prev,
+          [field]: e.imageUrls,
+        }));
+      } else {
+        setForm((prev) => ({
+          ...prev,
+          [field]: e.imageUrls.length === 1 ? e.imageUrls[0] : e.imageUrls,
+        }));
+      }
       return;
     }
 

@@ -47,9 +47,9 @@ const Footer = () => {
         <div className="w-full h-full bg-[radial-gradient(#22c55e_1px,transparent_1px)] [background-size:20px_20px]" />
       </motion.div>
 
-      <section className="w-full h-full px-4 sm:px-6 lg:px-8 bg-white bg-opacity-70 backdrop-blur-sm">
+      <section className="w-full h-full bg-white bg-opacity-70 backdrop-blur-sm">
         <motion.div 
-          className="py-8 sm:py-12 w-full"
+          className="py-8 sm:py-12 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
           variants={containerVariants}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}

@@ -4,7 +4,7 @@ import FileUpload from '@/components/ui/fileUpload';
 import { FileChangeEvent } from '@/types/formTypes';
 
 interface Step4Props {
-  projectPics: string[] | string | null;
+  projectPics: string[] | null;
   handleFileChange: (e: FileChangeEvent | null, field: string) => void;
   formData: any;
   onUploadStatusChange: (status: boolean) => void;
@@ -16,6 +16,14 @@ const Step4Pictures: React.FC<Step4Props> = ({
   formData, 
   onUploadStatusChange 
 }) => {
+  // Ensure formData has the project pics as an array
+  const formDataWithPicsArray = {
+    ...formData,
+    projectPics: Array.isArray(formData.projectPics) 
+      ? formData.projectPics 
+      : (formData.projectPics ? [formData.projectPics] : [])
+  };
+  
   return (
     <motion.div 
       className="space-y-6"
@@ -62,8 +70,9 @@ const Step4Pictures: React.FC<Step4Props> = ({
           maxFiles={5}
           formField="projectPics"
           handleFileChange={handleFileChange}
-          formData={formData}
+          formData={formDataWithPicsArray}
           onUploadStatusChange={onUploadStatusChange}
+          allowResizing={false}
         />
         
         <motion.div 

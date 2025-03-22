@@ -404,6 +404,8 @@ const HeroSection = () => {
   const [isBuilder, setIsBuilder] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("Trending");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(3);
   const heroRef = useRef(null);
   const isHeroInView = useInView(heroRef, { once: true });
   const { scrollY } = useScroll();
@@ -412,6 +414,9 @@ const HeroSection = () => {
   
   // Parallax effect for background
   const bgY = useTransform(scrollY, [0, 500], [0, -50]);
+  
+  // Items per page
+  const itemsPerPage = 6;
   
   // Trigger confetti on page load
   useEffect(() => {
@@ -432,6 +437,13 @@ const HeroSection = () => {
         const result: ApiResponse = await response.json();
         console.log(result);
         setProjects(result.data);
+        
+        // Calculate total pages based on filtered projects
+        const filteredProjects = result.data.filter((project) => 
+          ["all projects", "trending"].includes(selectedCategory.toLowerCase()) || 
+          project.category.toLowerCase() === selectedCategory.toLowerCase()
+        );
+        setTotalPages(Math.ceil(filteredProjects.length / itemsPerPage) || 1);
       } catch (error) {
         console.error("Error fetching projects:", error);
       } finally {
@@ -441,7 +453,7 @@ const HeroSection = () => {
     };
 
     fetchProjects();
-  }, []);
+  }, [selectedCategory]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -453,6 +465,7 @@ const HeroSection = () => {
 
   const handleCategoryClick = (category: string) => {
     setSelectedCategory(category);
+    setCurrentPage(1); // Reset to first page when changing category
     
     // Small confetti burst on category change
     confetti({
@@ -460,6 +473,31 @@ const HeroSection = () => {
       spread: 50,
       origin: { y: 0.5, x: 0.5 }
     });
+  };
+  
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to projects section
+    const projectsSection = document.getElementById('projects-section');
+    window.scrollTo({
+      top: (projectsSection?.offsetTop ?? 0) - 100,
+      behavior: 'smooth'
+    });
+  };
+  
+  // Get current projects to display based on pagination
+  const getCurrentProjects = () => {
+    if (!projects || !Array.isArray(projects)) return [];
+    
+    const filteredProjects = projects.filter((project) => 
+      ["all projects", "trending"].includes(selectedCategory.toLowerCase()) || 
+      project.category.toLowerCase() === selectedCategory.toLowerCase()
+    );
+    
+    const indexOfLastProject = currentPage * itemsPerPage;
+    const indexOfFirstProject = indexOfLastProject - itemsPerPage;
+    
+    return filteredProjects.slice(indexOfFirstProject, indexOfLastProject);
   };
 
   return (
@@ -498,13 +536,13 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* Content - Removing width constraints */}
-      <div className="relative w-full px-4 sm:px-6 lg:px-8">
-        <div className="pt-24 w-full">
+      {/* Content - Ensuring consistent alignment with navbar */}
+      <div className="relative w-full mx-auto max-w-7xl">
+        <div className="pt-24 w-full px-4 sm:px-6 lg:px-8">
           {/* Hero Content */}
           <motion.div 
             ref={heroRef}
-            className="max-w-2xl mb-16 z-20 relative ml-8 md:ml-16 lg:ml-24"
+            className="max-w-2xl mb-16 z-20 relative"
             initial={{ opacity: 0, y: 20 }}
             animate={{ 
               opacity: isHeroInView ? 1 : 0, 
@@ -613,18 +651,19 @@ const HeroSection = () => {
 
           {/* Projects Section - Ensuring full width */}
           <motion.div 
+            id="projects-section"
             className="w-full"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 1 }}
           >
-            <div className="flex justify-between items-center mb-4 w-full max-w-7xl mx-auto px-2 md:px-4 lg:px-8">
+            <div className="flex justify-between items-center mb-4 w-full">
               <h2 className="text-xl font-medium text-gray-900">Projects</h2>
             </div>
 
             {/* Category Filters */}
             <motion.div 
-              className="flex flex-wrap gap-3 mb-6 max-w-7xl mx-auto px-2 md:px-4 lg:px-8"
+              className="flex flex-wrap gap-3 mb-6"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 1.2 }}
@@ -694,73 +733,81 @@ const HeroSection = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="w-full max-w-7xl mx-auto px-2 md:px-4 lg:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                  className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
-                  {Array.isArray(projects) &&
-                    projects
-                      .filter((project) => 
-                        ["all projects", "trending"].includes(selectedCategory.toLowerCase()) || 
-                        project.category.toLowerCase() === selectedCategory.toLowerCase()
-                      )
-                      .map((project, i) => (
-                        <ProjectCard 
-                          key={project.id} 
-                          project={project} 
-                          index={i} 
-                          totalProjects={projects.filter(p => 
-                            ["all projects", "trending"].includes(selectedCategory.toLowerCase()) || 
-                            p.category.toLowerCase() === selectedCategory.toLowerCase()
-                          ).length} 
-                        />
-                      ))}
+                  {Array.isArray(projects) && getCurrentProjects().length > 0 ? (
+                    getCurrentProjects().map((project, i) => (
+                      <ProjectCard 
+                        key={project.id} 
+                        project={project} 
+                        index={i} 
+                        totalProjects={getCurrentProjects().length} 
+                      />
+                    ))
+                  ) : (
+                    <div className="col-span-3 text-center py-8 text-gray-500">
+                      No projects found for this category
+                    </div>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
 
             {/* Pagination */}
-            <motion.div 
-              className="flex justify-center items-center gap-2 mt-8 w-full max-w-7xl mx-auto px-2 md:px-4 lg:px-8"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 1.4 }}
-            >
-              <motion.button 
-                whileHover={{ scale: 1.05, x: -2 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 px-3 py-1 rounded-full text-gray-600 hover:bg-gray-50"
+            {!isLoading && totalPages > 1 && (
+              <motion.div 
+                className="flex justify-center items-center gap-2 mt-8 w-full"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 1.4 }}
               >
-                <ChevronLeft className="w-4 h-4" />
-                Previous
-              </motion.button>
-              {[1, 2, 3, "...", 10].map((page, i) => (
-                <motion.button
-                  key={i}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className={`w-8 h-8 flex items-center justify-center rounded-full ${
-                    page === 1 ? "bg-gray-100" : "hover:bg-gray-50"
-                  } text-black relative`}
-                >
-                  {page === 1 && (
-                    <motion.span
-                      layoutId="activePageBackground"
-                      className="absolute inset-0 bg-gray-100 rounded-full"
-                      initial={false}
-                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    />
-                  )}
-                  <span className="relative z-10">{page}</span>
-                </motion.button>
-              ))}
-              <motion.button 
-                whileHover={{ scale: 1.05, x: 2 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-1 px-3 py-1 rounded-full text-gray-600 hover:bg-gray-50"
-              >
-                Next
-                <ChevronRight className="w-4 h-4" />
-              </motion.button>
-            </motion.div>
+                {currentPage > 1 && (
+                  <motion.button 
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    whileHover={{ scale: 1.05, x: -2 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="flex items-center gap-2 px-3 py-1 rounded-full text-gray-600 hover:bg-gray-50"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Previous
+                  </motion.button>
+                )}
+                
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <motion.button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className={`w-8 h-8 flex items-center justify-center rounded-full ${
+                      page === currentPage ? "bg-gray-100" : "hover:bg-gray-50"
+                    } text-black relative`}
+                  >
+                    {page === currentPage && (
+                      <motion.span
+                        layoutId="activePageBackground"
+                        className="absolute inset-0 bg-gray-100 rounded-full"
+                        initial={false}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      />
+                    )}
+                    <span className="relative z-10">{page}</span>
+                  </motion.button>
+                ))}
+                
+                {currentPage < totalPages && (
+                  <motion.button 
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    whileHover={{ scale: 1.05, x: 2 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="flex items-center gap-1 px-3 py-1 rounded-full text-gray-600 hover:bg-gray-50"
+                  >
+                    Next
+                    <ChevronRight className="w-4 h-4" />
+                  </motion.button>
+                )}
+              </motion.div>
+            )}
           </motion.div>
         </div>
       </div>

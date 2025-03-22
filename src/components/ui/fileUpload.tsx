@@ -1,9 +1,10 @@
 "use client";
 import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { Upload, Trash2, X, Plus } from 'lucide-react';
+import { Upload, Trash2, X, Plus, Crop } from 'lucide-react';
 import { FileUploadProps } from '@/types/uploadTypes';
 import { toast } from 'react-hot-toast';
+import ImageResizer from './ImageResizer';
 
 const FileUpload: React.FC<FileUploadProps> = ({ 
   handleFileChange, 
@@ -12,21 +13,43 @@ const FileUpload: React.FC<FileUploadProps> = ({
   formField, 
   formData,
   onUploadStatusChange,
-  maxFiles = 5
+  maxFiles = 5,
+  allowResizing = false
 }) => {
     const [showPreview, setShowPreview] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+    const [showResizer, setShowResizer] = useState(false);
+    const [imageToResize, setImageToResize] = useState<string | null>(null);
+    const [tempImageFiles, setTempImageFiles] = useState<File[]>([]);
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (formData[formField]) {
-            setShowPreview(true);
-            setPreviewUrls(
-                Array.isArray(formData[formField])
-                    ? formData[formField] as string[]
-                    : [formData[formField] as string]
-            );
+            // Convert to array if needed
+            const urlsArray = Array.isArray(formData[formField])
+                ? formData[formField] as string[]
+                : [formData[formField] as string];
+            
+            // Only set showPreview to true if we actually have valid URLs
+            const validUrls = urlsArray.filter(url => url && typeof url === 'string' && url.trim() !== '');
+            
+            if (validUrls.length > 0) {
+                setShowPreview(true);
+                
+                // Only update previewUrls if it's different from current state
+                // to prevent unnecessarily resetting the state
+                const currentUrls = previewUrls.join(',');
+                const newUrls = validUrls.join(',');
+                
+                if (currentUrls !== newUrls) {
+                    console.log('Updating previewUrls from formData:', validUrls);
+                    setPreviewUrls(validUrls);
+                }
+            } else {
+                setShowPreview(false);
+                setPreviewUrls([]);
+            }
         } else {
             setShowPreview(false);
             setPreviewUrls([]);
@@ -54,22 +77,37 @@ const FileUpload: React.FC<FileUploadProps> = ({
             toast.error(`You can have a maximum of ${maxFiles} files. You currently have ${previewUrls.length}.`);
             return;
         }
-
+        
+        // Store the files for later processing
+        const files = Array.from(e.target.files);
+        
+        // If it's a logo and resizing is allowed, show the resizer for the first image only
+        if (!multiple && allowResizing && files.length > 0) {
+            const fileUrl = URL.createObjectURL(files[0]);
+            setImageToResize(fileUrl);
+            setTempImageFiles(files);
+            setShowResizer(true);
+            return;
+        }
+        
+        // Otherwise proceed with normal upload
+        await uploadFiles(files);
+    };
+    
+    const uploadFiles = async (files: File[]) => {
         setUploading(true);
         
         // Store local preview URLs for cleanup
         const localPreviewUrls: string[] = [];
         
         try {
-            const files = Array.from(e.target.files);
-            
             // Create local previews for immediate visual feedback
             const newLocalPreviews = files.map(file => URL.createObjectURL(file));
             localPreviewUrls.push(...newLocalPreviews);
             
-            // For multiple, append to existing previews rather than replacing
+            // For multiple uploads (banners), always append to existing previews
             if (multiple && previewUrls.length > 0) {
-                setPreviewUrls([...previewUrls, ...newLocalPreviews]);
+                setPreviewUrls(prev => [...prev, ...newLocalPreviews]);
             } else {
                 setPreviewUrls(newLocalPreviews);
             }
@@ -121,23 +159,37 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
             // Create a custom event with the uploaded URLs
             const customEvent = {
-                ...e,
+                ...{} as React.ChangeEvent<HTMLInputElement>,
                 imageUrls: multiple ? 
-                    // For multiple, merge with existing urls if any
-                    [...(Array.isArray(formData[formField]) ? formData[formField] as string[] : []), ...uploadedUrls] :
+                    // For multiple uploads (banners), always APPEND the new URLs
+                    [...(Array.isArray(formData[formField]) 
+                        ? formData[formField] as string[] 
+                        : (formData[formField] ? [formData[formField] as string] : [])), 
+                        ...uploadedUrls] :
                     uploadedUrls,
                 target: {
-                    ...e.target,
                     files: null
-                }
+                } as unknown as EventTarget & HTMLInputElement
             } as React.ChangeEvent<HTMLInputElement> & { imageUrls: string[] };
+            
+            // Debug logging for multiple uploads
+            if (multiple) {
+                console.log('Multiple upload - existing data:', formData[formField]);
+                console.log('Multiple upload - new URLs:', uploadedUrls);
+                console.log('Multiple upload - combined URLs:', customEvent.imageUrls);
+            }
             
             // Notify parent component of successful uploads
             handleFileChange(customEvent, formField);
             
             // Update local preview with actual uploaded URLs
-            if (multiple && Array.isArray(formData[formField])) {
-                setPreviewUrls([...(formData[formField] as string[]), ...uploadedUrls]);
+            if (multiple) {
+                // For banners, always append new URLs to existing ones that aren't temporary
+                setPreviewUrls(prev => {
+                    // Remove any temporary local URLs that were replaced by uploaded ones
+                    const filteredPrev = prev.filter(url => !localPreviewUrls.includes(url));
+                    return [...filteredPrev, ...uploadedUrls];
+                });
             } else {
                 setPreviewUrls(uploadedUrls);
             }
@@ -163,6 +215,40 @@ const FileUpload: React.FC<FileUploadProps> = ({
         }
     };
 
+    const handleResizedImage = async (dataUrl: string) => {
+        setShowResizer(false);
+        
+        // Convert the data URL to a file
+        const response = await fetch(dataUrl);
+        const blob = await response.blob();
+        const file = new File([blob], 'resized-image.jpg', { type: 'image/jpeg' });
+        
+        // Upload the resized image
+        await uploadFiles([file]);
+        
+        // Clean up the temporary image
+        if (imageToResize) {
+            URL.revokeObjectURL(imageToResize);
+            setImageToResize(null);
+        }
+    };
+
+    const cancelResizing = () => {
+        setShowResizer(false);
+        
+        // If user canceled resizing, upload the original image instead
+        if (tempImageFiles.length > 0) {
+            uploadFiles(tempImageFiles);
+        }
+        
+        // Clean up
+        if (imageToResize) {
+            URL.revokeObjectURL(imageToResize);
+            setImageToResize(null);
+        }
+        setTempImageFiles([]);
+    };
+
     const removeImage = (indexToRemove: number) => {
         // Create a new array without the image at the specified index
         const updatedPreviewUrls = previewUrls.filter((_, index) => index !== indexToRemove);
@@ -179,8 +265,11 @@ const FileUpload: React.FC<FileUploadProps> = ({
         } else {
             // Create a custom event to update the parent component
             const customEvent = {
+                ...{} as React.ChangeEvent<HTMLInputElement>,
                 imageUrls: updatedPreviewUrls,
-                target: { files: null }
+                target: { 
+                    files: null 
+                } as unknown as EventTarget & HTMLInputElement
             } as React.ChangeEvent<HTMLInputElement> & { imageUrls: string[] };
             
             // Pass the custom event to the parent component
@@ -210,7 +299,11 @@ const FileUpload: React.FC<FileUploadProps> = ({
                 multiple={multiple}
                 accept="image/*"
             />
-            {!showPreview && (
+            {/* Show the upload area when:
+                1. There are no previews to show (!showPreview), OR
+                2. It's a multiple upload and we haven't reached max files yet
+            */}
+            {(!showPreview || (multiple && previewUrls.length < maxFiles)) && (
                 <div
                     className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center cursor-pointer hover:bg-zinc-100 duration-300"
                     onClick={() => !uploading && inputRef.current?.click()}
@@ -224,18 +317,29 @@ const FileUpload: React.FC<FileUploadProps> = ({
                         <>
                             <Upload className="mx-auto h-12 w-12 text-gray-400 mb-2" />
                             <p className="text-black">
-                                Drop your {multiple ? 'images' : 'file'} here or <span className="text-emerald-500">browse</span>
+                                {showPreview ? 'Add more images' : `Drop your ${multiple ? 'images' : 'file'} here or `}
+                                <span className="text-emerald-500">browse</span>
                             </p>
                             <p className="text-sm text-gray-400 mt-1">
                                 Maximum size 20MB {multiple && `(Up to ${maxFiles} images)`}
                             </p>
+                            {allowResizing && !multiple && (
+                                <p className="text-xs text-amber-600 mt-2">
+                                    You'll be able to crop and resize after uploading
+                                </p>
+                            )}
+                            {multiple && showPreview && (
+                                <p className="text-xs text-amber-600 mt-2">
+                                    {previewUrls.length}/{maxFiles} images uploaded
+                                </p>
+                            )}
                         </>
                     )}
                 </div>
             )}
 
             {showPreview && previewUrls.length > 0 && (
-                <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center relative">
+                <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center relative mt-4">
                     {uploading && (
                         <div className="absolute inset-0 bg-white/80 z-10 flex items-center justify-center">
                             <div className="flex flex-col items-center">
@@ -253,38 +357,37 @@ const FileUpload: React.FC<FileUploadProps> = ({
                                     fill
                                     className="object-cover rounded-lg"
                                 />
-                                {multiple && (
+                                <button
+                                    className="absolute top-2 right-2 bg-black/70 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        removeImage(index);
+                                    }}
+                                    type="button"
+                                    title="Remove image"
+                                    disabled={uploading}
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                                
+                                {/* Resize button for single image (logo) */}
+                                {!multiple && allowResizing && (
                                     <button
-                                        className="absolute top-2 right-2 bg-black/70 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                        className="absolute top-2 left-2 bg-black/70 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            removeImage(index);
+                                            setImageToResize(url);
+                                            setShowResizer(true);
                                         }}
                                         type="button"
-                                        title="Remove image"
+                                        title="Resize image"
                                         disabled={uploading}
                                     >
-                                        <X className="w-4 h-4" />
+                                        <Crop className="w-4 h-4" />
                                     </button>
                                 )}
                             </div>
                         ))}
-                        
-                        {/* Add more button for multiple uploads */}
-                        {multiple && previewUrls.length < maxFiles && !uploading && (
-                            <div 
-                                className="relative h-48 border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors"
-                                onClick={() => !uploading && inputRef.current?.click()}
-                            >
-                                <div className="flex flex-col items-center">
-                                    <Plus className="h-8 w-8 text-gray-400" />
-                                    <p className="text-sm text-gray-500 mt-2">Add more</p>
-                                    <p className="text-xs text-gray-400">
-                                        {previewUrls.length}/{maxFiles}
-                                    </p>
-                                </div>
-                            </div>
-                        )}
                     </div>
                     <div className="flex justify-between items-center mt-4">
                         <button
@@ -312,6 +415,16 @@ const FileUpload: React.FC<FileUploadProps> = ({
                         )}
                     </div>
                 </div>
+            )}
+            
+            {/* Image Resizer Modal */}
+            {showResizer && imageToResize && (
+                <ImageResizer 
+                    src={imageToResize}
+                    onSave={handleResizedImage}
+                    onCancel={cancelResizing}
+                    aspectRatio={1} // 1:1 aspect ratio for logos
+                />
             )}
         </div>
     );

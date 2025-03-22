@@ -8,4 +8,5 @@ export interface FileUploadProps {
     };
     onUploadStatusChange?: (isUploading: boolean) => void;
     maxFiles?: number;
+    allowResizing?: boolean;
 }

@@ -47,6 +47,7 @@ const Step3Logo: React.FC<Step3Props> = ({
           handleFileChange={handleFileChange}
           formData={formData}
           onUploadStatusChange={onUploadStatusChange}
+          allowResizing={true}
         />
         
         <motion.div 
