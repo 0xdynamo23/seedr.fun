@@ -49,7 +49,27 @@ model Comment {
   text      String
   timestamp DateTime @default(now())
   projectId String
-  project   Project  @relation("ProjectComments", fields: [projectId], references: [id], onDelete: Cascade) // Update this line
+  userId    String?  // User who created the comment (wallet address)
+  project   Project  @relation("ProjectComments", fields: [projectId], references: [id], onDelete: Cascade)
+  
+  // Support for replies
+  parentId  Int?
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentReplies")
+  
+  // Likes relationship
+  likes     CommentLike[]
+}
+
+model CommentLike {
+  id        Int      @id @default(autoincrement())
+  commentId Int
+  userId    String   // User wallet address who liked the comment
+  timestamp DateTime @default(now())
+  
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  
+  @@unique([commentId, userId]) // Ensure each user can like a comment only once
 }
 
 enum ProjectStatus {

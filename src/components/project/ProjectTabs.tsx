@@ -32,15 +32,21 @@ interface Comment {
   text: string;
   author: string;
   timestamp: string;
+  replies?: Comment[];
+  likeCount?: number;
+  likes?: any[];
+  userId?: string;
 }
 
 interface ProjectTabsProps {
   project: Project;
   comments: Comment[];
-  onAddComment: (text: string) => void;
+  onAddComment: (text: string, parentId?: number) => void;
+  onToggleLike: (commentId: number) => void;
+  currentUserId: string;
 }
 
-const ProjectTabs = ({ project, comments, onAddComment }: ProjectTabsProps) => {
+const ProjectTabs = ({ project, comments, onAddComment, onToggleLike, currentUserId }: ProjectTabsProps) => {
   const [activeTab, setActiveTab] = useState("about");
   const [showFullDescription, setShowFullDescription] = useState(false);
 
@@ -178,6 +184,8 @@ const ProjectTabs = ({ project, comments, onAddComment }: ProjectTabsProps) => {
             <CommentsTab 
               comments={comments} 
               onAddComment={onAddComment} 
+              onToggleLike={onToggleLike}
+              currentUserId={currentUserId}
             />
           </motion.div>
         )}
