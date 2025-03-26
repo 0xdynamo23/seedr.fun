@@ -32,6 +32,8 @@ const AdminPage = () => {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [filter, setFilter] = useState<string>("ALL");
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const storedWallet = localStorage.getItem("xion-authz-granter-account");
@@ -50,13 +52,8 @@ const AdminPage = () => {
   const fetchProjects = async () => {
     try {
       const res = await fetch("/api/projects");
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
       const data = await res.json();
-      // Handle both array response and object with projects property
-      const projectsArray = Array.isArray(data) ? data : (data.projects || []);
-      setProjects(projectsArray);
+      setProjects(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching projects:", error);
       setProjects([]);
@@ -64,13 +61,29 @@ const AdminPage = () => {
   };
 
   const updateProjectStatus = async (projectId: number, status: "ACCEPTED" | "REJECTED") => {
-    await fetch("/api/projects/update", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ projectId, status }),
-    });
-    fetchProjects();
-    setSelectedProject(null);
+    try {
+      setError(null);
+      setSuccessMessage(null);
+      
+      const res = await fetch("/api/projects/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId, status }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.details || data.error || `Failed to update project status`);
+      }
+
+      setSuccessMessage(`Project status updated to ${status}`);
+      await fetchProjects(); // Refresh the projects list
+      setSelectedProject(null);
+    } catch (error) {
+      console.error("Error updating project status:", error);
+      setError(error instanceof Error ? error.message : "Failed to update project status");
+    }
   };
 
   if (!isSuperAdmin) {
@@ -88,6 +101,18 @@ const AdminPage = () => {
         <MaxWidthWrapper>
           <div className="p-6">
             <h1 className="text-3xl font-bold text-black mb-8">Admin Dashboard</h1>
+
+            {error && (
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-600">Error: {error}</p>
+              </div>
+            )}
+
+            {successMessage && (
+              <div className="mb-4 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
+                <p className="text-emerald-600">{successMessage}</p>
+              </div>
+            )}
 
             <div className="mb-4">
               <Button onClick={() => setFilter("ALL")} className={filter === "ALL" ? "bg-emerald-500 text-white" : ""}>All</Button>
