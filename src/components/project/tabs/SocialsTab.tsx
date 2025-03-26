@@ -165,7 +165,7 @@ const SocialsTab = ({ project }: SocialsTabProps) => {
               
               {link.website && (
                 <motion.a 
-                  href={link.website} 
+                  href={link.website.startsWith('http') ? link.website : `https://${link.website}`}
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-xl hover:shadow-lg transition-all duration-300 relative overflow-hidden group"
