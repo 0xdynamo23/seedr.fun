@@ -48,9 +48,19 @@ const AdminPage = () => {
   }, [isSuperAdmin]);
 
   const fetchProjects = async () => {
-    const res = await fetch("/api/projects");
-    const data = await res.json();
-    setProjects(data);
+    try {
+      const res = await fetch("/api/projects");
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      const data = await res.json();
+      // Handle both array response and object with projects property
+      const projectsArray = Array.isArray(data) ? data : (data.projects || []);
+      setProjects(projectsArray);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+      setProjects([]);
+    }
   };
 
   const updateProjectStatus = async (projectId: number, status: "ACCEPTED" | "REJECTED") => {
@@ -67,7 +77,9 @@ const AdminPage = () => {
     return <p className="text-center text-red-500 text-lg">Access Denied</p>;
   }
 
-  const filteredProjects = filter === "ALL" ? projects : projects.filter(project => project.status === filter);
+  const filteredProjects = Array.isArray(projects) 
+    ? (filter === "ALL" ? projects : projects.filter(project => project.status === filter))
+    : [];
 
   return (
     <>
